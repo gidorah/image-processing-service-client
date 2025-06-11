@@ -9,7 +9,7 @@ export default function Footer() {
             <a
               href="https://github.com/gidorah"
               target="_blank"
-              rel="noreferrer"
+              rel="noreferrer noopener"
               className="font-medium underline underline-offset-4"
             >
               gidorah
@@ -18,7 +18,7 @@ export default function Footer() {
             <a
               href="https://github.com/gidorah/image-processing-service-client"
               target="_blank"
-              rel="noreferrer"
+              rel="noreferrer noopener"
               className="font-medium underline underline-offset-4"
             >
               GitHub
