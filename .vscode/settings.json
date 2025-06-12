@@ -1,0 +1,20 @@
+{
+  // Set Prettier as the default formatter
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // Enable format on save
+  "editor.formatOnSave": true,
+
+  // Run ESLint's auto-fix on save
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  // Force the extension to use your project's version of Prettier
+  "prettier.prettierPath": "./node_modules/prettier",
+
+  // Optional: For Tailwind CSS IntelliSense extension
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ]
+}
