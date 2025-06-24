@@ -34,7 +34,7 @@ export function SignupForm({
       api.post("/auth/registration/", values),
     onSuccess: () => {
       setAuth(true); // cookies are set server-side
-      //router.replace("/(main)/dashboard"); // or wherever
+      router.replace("/(main)/");
     },
     onError: (err) => {
       alert(err.message);
@@ -84,6 +84,11 @@ export function SignupForm({
                   required
                   {...form.register("password2")}
                 />
+                {form.formState.errors.password2 && (
+                  <p className="text-sm text-red-500">
+                    {form.formState.errors.password2.message}
+                  </p>
+                )}
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">

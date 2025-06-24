@@ -33,7 +33,7 @@ export function LoginForm({
     mutationFn: (values: LoginInput) => api.post("/auth/login/", values),
     onSuccess: () => {
       setAuth(true); // cookies are set server-side
-      //router.replace("/(main)/dashboard"); // or wherever
+      router.replace("/(main)/");
     },
     onError: (err) => {
       alert(err.message);
