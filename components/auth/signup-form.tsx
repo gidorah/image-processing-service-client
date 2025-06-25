@@ -17,6 +17,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signupSchema, SignupInput } from "@/lib/validators";
 import useAuthStore from "@/store/authStore";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+
+type AuthErrorResponse = {
+  non_field_errors?: string[];
+  email?: string[];
+  password1?: string[];
+  password2?: string[];
+};
 
 export function SignupForm({
   className,
@@ -36,8 +45,16 @@ export function SignupForm({
       setAuth(true); // cookies are set server-side
       router.replace("/(main)/");
     },
-    onError: (err) => {
-      alert(err.message);
+    onError: (err: AxiosError<AuthErrorResponse>) => {
+      if (err.response?.data?.email?.[0]) {
+        toast.error(err.response.data.email[0]);
+      } else if (err.response?.data?.password1?.[0]) {
+        toast.error(err.response.data.password1[0]);
+      } else if (err.message) {
+        toast.error(err.message);
+      } else {
+        toast.error("An error occurred during signup");
+      }
     },
   });
 
@@ -64,6 +81,11 @@ export function SignupForm({
                   required
                   {...form.register("email")}
                 />
+                {form.formState.errors.email && (
+                  <p className="text-sm text-red-500">
+                    {form.formState.errors.email.message}
+                  </p>
+                )}
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">

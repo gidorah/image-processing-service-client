@@ -17,6 +17,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@/lib/validators";
 import useAuthStore from "@/store/authStore";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+
+type AuthErrorResponse = { non_field_errors?: string[] };
 
 export function LoginForm({
   className,
@@ -35,8 +39,14 @@ export function LoginForm({
       setAuth(true); // cookies are set server-side
       router.replace("/(main)/");
     },
-    onError: (err) => {
-      alert(err.message);
+    onError: (err: AxiosError<AuthErrorResponse>) => {
+      if (err.response?.data?.non_field_errors?.[0]) {
+        toast.error(err.response.data.non_field_errors[0]);
+      } else if (err.message) {
+        toast.error(err.message);
+      } else {
+        toast.error("An error occurred during login");
+      }
     },
   });
 
