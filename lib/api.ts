@@ -1,5 +1,6 @@
 import useAuthStore from "@/store/authStore";
 import axios, { AxiosError } from "axios";
+import { User } from "./types";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api",
@@ -54,5 +55,12 @@ api.interceptors.response.use(
  * @throws {AxiosError} If the logout request fails (network error, server error, etc.)
  */
 export const logoutUser = () => api.post("/auth/logout/");
+
+/**
+ * Checks if the user is authenticated by making a GET request to the user endpoint
+ *
+ * @returns {Promise<AxiosResponse<User>>} Promise that resolves to the user data if authenticated, otherwise rejects with an error
+ */
+export const checkAuthStatus = () => api.get<User>("/auth/user/");
 
 export default api;
