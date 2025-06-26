@@ -4,9 +4,16 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import useAuthStore from "@/store/authStore";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, logout } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
+  };
 
   return (
     <header className="flex items-center justify-between p-4">
@@ -20,6 +27,11 @@ export default function Header() {
         />
       </Link>
       <div className="flex gap-4">
+        {isAuthenticated && (
+          <Button variant="outline" onClick={handleLogout}>
+            Logout
+          </Button>
+        )}
         {!isAuthenticated && (
           <>
             <Button variant="outline" asChild>
