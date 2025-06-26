@@ -27,7 +27,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
-  const setAuth = useAuthStore((s) => s.setAuth);
+  const { setAuth } = useAuthStore();
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -36,8 +36,8 @@ export function LoginForm({
   const loginMutation = useMutation({
     mutationFn: (values: LoginInput) => api.post("/auth/login/", values),
     onSuccess: () => {
-      setAuth(true); // cookies are set server-side
-      router.replace("/(main)/");
+      setAuth(true);
+      router.replace("/");
     },
     onError: (err: AxiosError<AuthErrorResponse>) => {
       if (err.response?.data?.non_field_errors?.[0]) {

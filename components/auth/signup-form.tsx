@@ -42,8 +42,8 @@ export function SignupForm({
     mutationFn: (values: SignupInput) =>
       api.post("/auth/registration/", values),
     onSuccess: () => {
-      setAuth(true); // cookies are set server-side
-      router.replace("/(main)/");
+      setAuth(true);
+      router.replace("/");
     },
     onError: (err: AxiosError<AuthErrorResponse>) => {
       if (err.response?.data?.email?.[0]) {
