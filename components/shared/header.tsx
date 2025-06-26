@@ -4,9 +4,22 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import useAuthStore from "@/store/authStore";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Header() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, logout, loading } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Failed to logout. Please try again.");
+    }
+  };
 
   return (
     <header className="flex items-center justify-between p-4">
@@ -20,16 +33,21 @@ export default function Header() {
         />
       </Link>
       <div className="flex gap-4">
-        {!isAuthenticated && (
-          <>
-            <Button variant="outline" asChild>
-              <Link href="/login">Login</Link>
+        {!loading &&
+          (isAuthenticated ? (
+            <Button variant="outline" onClick={handleLogout}>
+              Logout
             </Button>
-            <Button asChild>
-              <Link href="/signup">Signup</Link>
-            </Button>
-          </>
-        )}
+          ) : (
+            <>
+              <Button variant="outline" asChild>
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/signup">Signup</Link>
+              </Button>
+            </>
+          ))}
       </div>
     </header>
   );

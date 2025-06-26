@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/authStore";
 
-export default function MainLayout({
+export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -13,12 +13,13 @@ export default function MainLayout({
   const { isAuthenticated, loading } = useAuthStore();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push("/login");
+    if (!loading && isAuthenticated) {
+      router.push("/");
     }
   }, [isAuthenticated, loading, router]);
 
-  if (loading || !isAuthenticated) {
+  // While redirecting, return null to avoid showing the auth page content
+  if (loading || isAuthenticated) {
     return null;
   }
 
