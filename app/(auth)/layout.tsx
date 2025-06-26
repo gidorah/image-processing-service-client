@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/authStore";
 
 export default function AuthLayout({
@@ -10,17 +10,16 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const pathname = usePathname();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, loading } = useAuthStore();
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!loading && isAuthenticated) {
       router.push("/");
     }
-  }, [isAuthenticated, pathname, router]);
+  }, [isAuthenticated, loading, router]);
 
   // While redirecting, return null to avoid showing the auth page content
-  if (isAuthenticated) {
+  if (loading || isAuthenticated) {
     return null;
   }
 
