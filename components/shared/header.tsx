@@ -5,14 +5,20 @@ import Image from "next/image";
 import Link from "next/link";
 import useAuthStore from "@/store/authStore";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Header() {
   const { isAuthenticated, logout, loading } = useAuthStore();
   const router = useRouter();
 
   const handleLogout = async () => {
-    await logout();
-    router.push("/login");
+    try {
+      await logout();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Failed to logout. Please try again.");
+    }
   };
 
   return (

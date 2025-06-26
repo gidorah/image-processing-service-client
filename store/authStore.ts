@@ -24,7 +24,10 @@ const useAuthStore = create<AuthState>()((set) => ({
     try {
       const { data: user } = await checkAuthStatus();
       set({ isAuthenticated: true, user, loading: false });
-    } catch {
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") {
+        console.log("Auth verification failed: ", error);
+      }
       set({ isAuthenticated: false, user: null, loading: false });
     }
   },
