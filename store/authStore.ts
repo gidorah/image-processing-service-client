@@ -15,7 +15,7 @@ const useAuthStore = create<AuthState>()((set) => ({
   isAuthenticated: false,
   user: null,
   loading: true, // Start with loading state
-  setAuth: (v) => set({ isAuthenticated: v }),
+setAuth: (v) => set({ isAuthenticated: v, user: null }),
   logout: async () => {
     await logoutUser();
     set({ isAuthenticated: false, user: null });
