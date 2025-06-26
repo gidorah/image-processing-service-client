@@ -7,7 +7,7 @@ import useAuthStore from "@/store/authStore";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
-  const { isAuthenticated, logout } = useAuthStore();
+  const { isAuthenticated, logout, loading } = useAuthStore();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -27,21 +27,21 @@ export default function Header() {
         />
       </Link>
       <div className="flex gap-4">
-        {isAuthenticated && (
-          <Button variant="outline" onClick={handleLogout}>
-            Logout
-          </Button>
-        )}
-        {!isAuthenticated && (
-          <>
-            <Button variant="outline" asChild>
-              <Link href="/login">Login</Link>
+        {!loading &&
+          (isAuthenticated ? (
+            <Button variant="outline" onClick={handleLogout}>
+              Logout
             </Button>
-            <Button asChild>
-              <Link href="/signup">Signup</Link>
-            </Button>
-          </>
-        )}
+          ) : (
+            <>
+              <Button variant="outline" asChild>
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/signup">Signup</Link>
+              </Button>
+            </>
+          ))}
       </div>
     </header>
   );
