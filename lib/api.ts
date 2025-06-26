@@ -25,12 +25,12 @@ api.interceptors.response.use(
       console.log("401 Unauthorized on response interceptor: ", error.response);
       // Ensure we're on the client side before accessing browser APIs
       if (typeof window !== "undefined") {
-        const { isAuthenticated, setAuth } = useAuthStore.getState();
+        const { isAuthenticated } = useAuthStore.getState();
 
         // Only logout and redirect if user was previously authenticated
         // This prevents unnecessary redirects for unauthenticated requests
         if (isAuthenticated) {
-          setAuth(false);
+          useAuthStore.setState({ isAuthenticated: false, user: null });
           window.location.href = "/login";
         }
       }
