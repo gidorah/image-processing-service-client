@@ -11,8 +11,6 @@ function authenticationMiddleware(request: NextRequest): NextResponse | null {
 
   const isAuthPage = pathname === "/login" || pathname === "/signup";
 
-  console.log(authToken, isAuthPage, pathname);
-
   // Redirect authenticated users away from auth pages
   if (authToken && isAuthPage) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
