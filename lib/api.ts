@@ -31,7 +31,6 @@ api.interceptors.response.use(
         // This prevents unnecessary redirects for unauthenticated requests
         if (isAuthenticated) {
           useAuthStore.setState({ isAuthenticated: false, user: null });
-          window.location.href = "/login";
         }
       }
     }

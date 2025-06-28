@@ -43,7 +43,7 @@ export function SignupForm({
       api.post("/auth/registration/", values),
     onSuccess: () => {
       setAuth(true);
-      router.replace("/dashboard");
+      router.push("/dashboard");
     },
     onError: (err: AxiosError<AuthErrorResponse>) => {
       if (err.response?.data?.email?.[0]) {

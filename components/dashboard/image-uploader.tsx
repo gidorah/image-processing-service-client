@@ -1,12 +1,32 @@
 "use client";
 
 import { useCallback } from "react";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, FileRejection } from "react-dropzone";
+import { toast } from "sonner";
 
 export default function ImageUploader() {
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    console.log(acceptedFiles);
-  }, []);
+  const onDrop = useCallback(
+    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      if (fileRejections.length > 0) {
+        fileRejections.forEach(({ errors }) => {
+          errors.forEach((err) => {
+            if (err.code === "file-too-large") {
+              toast.error("File is larger than 10MB");
+            } else if (err.code === "file-invalid-type") {
+              toast.error("Invalid file type. Please upload a PNG or JPG.");
+            } else {
+              toast.error(err.message);
+            }
+          });
+        });
+        return;
+      }
+
+      // TODO: Handle the actual upload logic for acceptedFiles
+      console.log(acceptedFiles);
+    },
+    []
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
