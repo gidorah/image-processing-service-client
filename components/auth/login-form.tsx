@@ -37,7 +37,7 @@ export function LoginForm({
     mutationFn: (values: LoginInput) => api.post("/auth/login/", values),
     onSuccess: () => {
       setAuth(true);
-      router.replace("/");
+      router.replace("/dashboard");
     },
     onError: (err: AxiosError<AuthErrorResponse>) => {
       if (err.response?.data?.non_field_errors?.[0]) {
