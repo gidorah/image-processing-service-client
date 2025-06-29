@@ -62,4 +62,18 @@ export const logoutUser = () => api.post("/auth/logout/");
  */
 export const checkAuthStatus = () => api.get<User>("/auth/user/");
 
+export const uploadImage = async (image: File): Promise<{ id: string }> => {
+  const formData = new FormData();
+  formData.append("file", image);
+  formData.append("description", "TODO");
+
+  const response = await api.post("/images/upload/", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+};
+
 export default api;
