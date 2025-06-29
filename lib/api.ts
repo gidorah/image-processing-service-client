@@ -5,7 +5,6 @@ import { User } from "./types";
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api",
   withCredentials: true,
-  headers: { "Content-Type": "application/json" },
 });
 
 /**
@@ -67,11 +66,7 @@ export const uploadImage = async (image: File): Promise<{ id: string }> => {
   formData.append("file", image);
   formData.append("description", "TODO");
 
-  const response = await api.post("/images/upload/", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const response = await api.post("/images/upload/", formData);
 
   return response.data;
 };
