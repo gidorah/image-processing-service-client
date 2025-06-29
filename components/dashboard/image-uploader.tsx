@@ -100,7 +100,9 @@ export default function ImageUploader() {
       {isFileRejected && (
         <div className="w-full rounded-md border border-red-300 bg-red-50 p-3 text-center text-sm text-red-700">
           <p>
-            {fileRejections[0].errors[0].message === "File is larger than 10MB"
+            {fileRejections[0].errors[0].message.startsWith(
+              "File is larger than"
+            )
               ? "File size exceeds 10MB."
               : "Invalid file type. Please upload a PNG or JPG."}
           </p>
