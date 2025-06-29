@@ -49,6 +49,21 @@ export default function ImageUploader() {
     });
 
   const isFileRejected = fileRejections.length > 0;
+  let errorMessage = "An unknown error occurred.";
+
+  if (isFileRejected) {
+    switch (fileRejections[0].errors[0].code) {
+      case "file-too-large":
+        errorMessage = "File size exceeds 10MB.";
+        break;
+      case "file-invalid-type":
+        errorMessage = "Invalid file type. Please upload a PNG or JPG.";
+        break;
+      case "too-many-files":
+        errorMessage = "You can only upload one file at a time.";
+        break;
+    }
+  }
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -99,13 +114,7 @@ export default function ImageUploader() {
       </div>
       {isFileRejected && (
         <div className="w-full rounded-md border border-red-300 bg-red-50 p-3 text-center text-sm text-red-700">
-          <p>
-            {fileRejections[0].errors[0].message.startsWith(
-              "File is larger than"
-            )
-              ? "File size exceeds 10MB."
-              : "Invalid file type. Please upload a PNG or JPG."}
-          </p>
+          <p>{errorMessage}</p>
         </div>
       )}
     </div>
