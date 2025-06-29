@@ -49,20 +49,28 @@ export default function ImageUploader() {
     });
 
   const isFileRejected = fileRejections.length > 0;
-  let errorMessage = "An unknown error occurred.";
+  let errorMessage = "";
 
-  if (isFileRejected) {
-    switch (fileRejections[0].errors[0].code) {
-      case "file-too-large":
-        errorMessage = "File size exceeds 10MB.";
-        break;
-      case "file-invalid-type":
-        errorMessage = "Invalid file type. Please upload a PNG or JPG.";
-        break;
-      case "too-many-files":
-        errorMessage = "You can only upload one file at a time.";
-        break;
-    }
+  const messages = new Set<string>();
+  fileRejections.forEach(({ errors }) => {
+    errors.forEach((err) => {
+      switch (err.code) {
+        case "file-too-large":
+          messages.add("File size exceeds 10MB.");
+          break;
+        case "file-invalid-type":
+          messages.add("Invalid file type. Please upload a PNG or JPG.");
+          break;
+        case "too-many-files":
+          messages.add("You can only upload one file at a time.");
+          break;
+        default:
+          messages.add(err.message);
+      }
+    });
+  });
+  if (messages.size > 0) {
+    errorMessage = [...messages].join(", ");
   }
 
   return (
