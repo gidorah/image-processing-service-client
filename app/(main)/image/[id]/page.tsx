@@ -9,19 +9,20 @@ import React from "react";
 export default function ImageDetailPage({
   params,
 }: {
-  params: Promise<{ id: number }>;
+  params: Promise<{ id: string }>;
 }) {
   const { id } = React.use(params);
-  console.log(id);
+  const imageId = Number(id);
+
   const {
     data: image,
     isLoading,
     isError,
     error,
   } = useQuery<SourceImageType>({
-    queryKey: ["image", id],
-    queryFn: () => getSourceImageDetails(id),
-    enabled: !!id,
+    queryKey: ["image", imageId],
+    queryFn: () => getSourceImageDetails(imageId),
+    enabled: !!imageId && !isNaN(imageId),
   });
 
   if (isLoading) {
@@ -32,17 +33,19 @@ export default function ImageDetailPage({
     return <div>Error: {error.message}</div>;
   }
 
+  if (!image) {
+    return <div>Image not found.</div>;
+  }
+
   return (
     <div className="flex items-center justify-center rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
-      {image && (
-        <Image
-          src={image.file}
-          alt={image.fileName || "Uploaded image"}
-          width={500}
-          height={500}
-          className="max-h-[70vh] rounded-lg object-contain"
-        />
-      )}
+      <Image
+        src={image.file}
+        alt={image.fileName || "Uploaded image"}
+        width={500}
+        height={500}
+        className="max-h-[70vh] rounded-lg object-contain"
+      />
     </div>
   );
 }
