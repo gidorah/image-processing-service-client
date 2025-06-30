@@ -22,7 +22,7 @@ export default function ImageDetailPage({
   } = useQuery<SourceImageType>({
     queryKey: ["image", imageId],
     queryFn: () => getSourceImageDetails(imageId),
-    enabled: !!imageId && !isNaN(imageId),
+    enabled: imageId >= 0 && !isNaN(imageId),
   });
 
   if (isLoading) {
