@@ -1,6 +1,6 @@
 import useAuthStore from "@/store/authStore";
 import axios, { AxiosError } from "axios";
-import { User } from "./types";
+import { SourceImageType, User } from "./types";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api",
@@ -68,6 +68,19 @@ export const uploadImage = async (image: File): Promise<{ id: string }> => {
 
   const response = await api.post("/images/upload/", formData);
 
+  return response.data;
+};
+
+/**
+ * Fetches the details of a source image by its ID.
+ *
+ * @param {number} id - The ID of the source image to fetch.
+ * @returns {Promise<SourceImageType>} A promise that resolves to the source image details.
+ */
+export const getSourceImageDetails = async (
+  id: number
+): Promise<SourceImageType> => {
+  const response = await api.get(`/images/${id}/`);
   return response.data;
 };
 
