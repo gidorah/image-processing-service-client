@@ -34,7 +34,7 @@ export const rotateParamsSchema = z.object({
   degrees: z.number().min(0).max(359),
 });
 export const filterParamsSchema = z.object({
-  greyscale: z.boolean().optional(),
+  grayscale: z.boolean().optional(),
   sepia: z.boolean().optional(),
   blur: z.boolean().optional(),
 });
@@ -45,7 +45,10 @@ export const transformationSchema = z.discriminatedUnion("operation", [
   z.object({ operation: z.literal("crop"), params: cropParamsSchema }),
   z.object({ operation: z.literal("resize"), params: resizeParamsSchema }),
   z.object({ operation: z.literal("rotate"), params: rotateParamsSchema }),
-  z.object({ operation: z.literal("filter"), params: filterParamsSchema }),
+  z.object({
+    operation: z.literal("apply_filter"),
+    params: filterParamsSchema,
+  }),
   z.object({
     operation: z.literal("watermark"),
     params: watermarkParamsSchema,
