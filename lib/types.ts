@@ -21,9 +21,9 @@ export interface BaseImageType {
 }
 
 /**
- * Represents a SourceImage from the API. It extends the base type.
+ * Represents a SourceImage from the API. It "could" extend base type in the future.
  */
-export interface SourceImageType extends BaseImageType {}
+export type SourceImageType = BaseImageType;
 
 /**
  * Represents a TransformedImage from the API.
