@@ -1,0 +1,48 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    /* ──────────────────────────────────────────
+       1. Start Next.js in dev mode _with_ --inspect
+    ─────────────────────────────────────────── */
+    {
+      "name": "Next.js: Dev (server)",
+      "type": "pwa-node",
+      "request": "launch",
+      // Launch `next dev` through Node so we can pass --inspect
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--inspect", // open inspector on 9229
+        "${workspaceFolder}/node_modules/next/dist/bin/next",
+        "dev"
+      ],
+      "cwd": "${workspaceFolder}",
+      "autoAttachChildProcesses": true, // also attach to API route workers
+      "skipFiles": ["<node_internals>/**"]
+    },
+
+    /* ──────────────────────────────────────────
+       2. Launch Chrome and attach to the client
+    ─────────────────────────────────────────── */
+    {
+      "name": "Chrome: Client",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+
+  /* ──────────────────────────────────────────
+     3. One-click full-stack debugging
+  ─────────────────────────────────────────── */
+  "compounds": [
+    {
+      "name": "Next.js: Full-stack",
+      "configurations": ["Next.js: Dev (server)", "Chrome: Client"]
+    }
+  ]
+}
