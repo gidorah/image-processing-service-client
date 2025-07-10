@@ -20,6 +20,7 @@ export const signupSchema = z
 
 export type SignupInput = z.infer<typeof signupSchema>;
 
+export const formatSchema = z.enum(["jpeg", "png"]);
 export const cropParamsSchema = z.object({
   width: z.number().positive(),
   height: z.number().positive(),
@@ -57,7 +58,46 @@ export const transformationSchema = z.discriminatedUnion("operation", [
   z.object({ operation: z.literal("mirror") }),
 ]);
 export const transformRequestSchema = z.object({
-  format: z.enum(["jpeg", "png"]).optional(),
+  format: formatSchema.optional(),
   transformations: z.array(transformationSchema).min(1),
 });
 export type TransformRequest = z.infer<typeof transformRequestSchema>;
+
+/**
+ * Structure of API schema is not compatible with React Hook From
+ * or any other form library since request has an array of Transformations
+ * and it is not possible to resolve changing transformations list correctly
+ * with transformRequestSchema. So we created transformationFormSchema to
+ * validate TransformationForm then on submit it converts into transformRequestSchema.
+ */
+export const transformationFormSchema = z.object({
+  format: formatSchema,
+  crop: z.object({
+    active: z.boolean(),
+    width: z.number().positive(),
+    height: z.number().positive(),
+    x: z.number().nonnegative(),
+    y: z.number().nonnegative(),
+  }),
+  resize: z.object({
+    active: z.boolean(),
+    scale: z.number().min(0.2).max(5).step(0.2),
+  }),
+  rotate: rotateParamsSchema
+    .extend({
+      active: z.boolean(),
+    })
+    .required(),
+  filters: z.object({
+    grayscale: z.boolean(),
+    sepia: z.boolean(),
+    blur: z.boolean(),
+  }),
+  watermark: watermarkParamsSchema.extend({
+    active: z.boolean(),
+  }),
+  flip: z.boolean(),
+  mirror: z.boolean(),
+});
+
+export type TransformationFormValues = z.infer<typeof transformationFormSchema>;
