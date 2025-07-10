@@ -13,6 +13,7 @@ All authentication endpoints are prefixed with `/api/auth/`.
 Authenticates a user and returns an access and refresh token.
 
 **Request:**
+
 ```http
 POST /api/auth/login/
 Content-Type: application/json
@@ -24,17 +25,18 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
-    "access_token": "string",
-    "refresh_token": "string",
-    "user": {
-        "pk": 0,
-        "username": "string",
-        "email": "user@example.com",
-        "first_name": "string",
-        "last_name": "string"
-    }
+  "access_token": "string",
+  "refresh_token": "string",
+  "user": {
+    "pk": 0,
+    "username": "string",
+    "email": "user@example.com",
+    "first_name": "string",
+    "last_name": "string"
+  }
 }
 ```
 
@@ -45,15 +47,18 @@ Content-Type: application/json
 Logs out the current user.
 
 **Request:**
+
 ```http
 POST /api/auth/logout/
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 {
-    "detail": "Successfully logged out."
+  "detail": "Successfully logged out."
 }
 ```
 
@@ -64,6 +69,7 @@ POST /api/auth/logout/
 Registers a new user.
 
 **Request:**
+
 ```http
 POST /api/auth/registration/
 Content-Type: application/json
@@ -77,17 +83,18 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
-    "access_token": "string",
-    "refresh_token": "string",
-    "user": {
-        "pk": 0,
-        "username": "string",
-        "email": "user@example.com",
-        "first_name": "string",
-        "last_name": "string"
-    }
+  "access_token": "string",
+  "refresh_token": "string",
+  "user": {
+    "pk": 0,
+    "username": "string",
+    "email": "user@example.com",
+    "first_name": "string",
+    "last_name": "string"
+  }
 }
 ```
 
@@ -98,6 +105,7 @@ Content-Type: application/json
 Initiates the password reset process.
 
 **Request:**
+
 ```http
 POST /api/auth/password/reset/
 Content-Type: application/json
@@ -108,9 +116,10 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
-    "detail": "Password reset e-mail has been sent."
+  "detail": "Password reset e-mail has been sent."
 }
 ```
 
@@ -121,6 +130,7 @@ Content-Type: application/json
 Confirms the password reset with a new password.
 
 **Request:**
+
 ```http
 POST /api/auth/password/reset/confirm/
 Content-Type: application/json
@@ -134,9 +144,10 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
-    "detail": "Password has been reset with the new password."
+  "detail": "Password has been reset with the new password."
 }
 ```
 
@@ -147,6 +158,7 @@ Content-Type: application/json
 Changes the password for the authenticated user.
 
 **Request:**
+
 ```http
 POST /api/auth/password/change/
 Content-Type: application/json
@@ -156,12 +168,14 @@ Content-Type: application/json
     "new_password2": "string"
 }
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 {
-    "detail": "New password has been saved."
+  "detail": "New password has been saved."
 }
 ```
 
@@ -172,19 +186,22 @@ Content-Type: application/json
 Retrieves details for the authenticated user.
 
 **Request:**
+
 ```http
 GET /api/auth/user/
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 {
-    "pk": 0,
-    "username": "string",
-    "email": "user@example.com",
-    "first_name": "string",
-    "last_name": "string"
+  "pk": 0,
+  "username": "string",
+  "email": "user@example.com",
+  "first_name": "string",
+  "last_name": "string"
 }
 ```
 
@@ -195,6 +212,7 @@ GET /api/auth/user/
 Updates details for the authenticated user.
 
 **Request:**
+
 ```http
 PUT /api/auth/user/
 Content-Type: application/json
@@ -206,16 +224,18 @@ Content-Type: application/json
     "last_name": "string"
 }
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 {
-    "pk": 0,
-    "username": "string",
-    "email": "user@example.com",
-    "first_name": "string",
-    "last_name": "string"
+  "pk": 0,
+  "username": "string",
+  "email": "user@example.com",
+  "first_name": "string",
+  "last_name": "string"
 }
 ```
 
@@ -226,6 +246,7 @@ Content-Type: application/json
 Partially updates details for the authenticated user.
 
 **Request:**
+
 ```http
 PATCH /api/auth/user/
 Content-Type: application/json
@@ -234,16 +255,18 @@ Content-Type: application/json
     "first_name": "string"
 }
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 {
-    "pk": 0,
-    "username": "string",
-    "email": "user@example.com",
-    "first_name": "string",
-    "last_name": "string"
+  "pk": 0,
+  "username": "string",
+  "email": "user@example.com",
+  "first_name": "string",
+  "last_name": "string"
 }
 ```
 
@@ -254,6 +277,7 @@ Content-Type: application/json
 Verifies a JWT token.
 
 **Request:**
+
 ```http
 POST /api/token/verify/
 Content-Type: application/json
@@ -264,6 +288,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {}
 ```
@@ -275,6 +300,7 @@ Content-Type: application/json
 Refreshes an access token using a refresh token.
 
 **Request:**
+
 ```http
 POST /api/token/refresh/
 Content-Type: application/json
@@ -285,9 +311,10 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
-    "access": "string"
+  "access": "string"
 }
 ```
 
@@ -300,21 +327,24 @@ Content-Type: application/json
 Lists all source images owned by the user.
 
 **Request:**
+
 ```http
 GET /api/images/
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 [
-    {
-        "id": 0,
-        "file_name": "string",
-        "description": "string",
-        "file": "string (url)",
-        "owner": 0
-    }
+  {
+    "id": 0,
+    "file_name": "string",
+    "description": "string",
+    "file": "string (url)",
+    "owner": 0
+  }
 ]
 ```
 
@@ -325,22 +355,25 @@ GET /api/images/
 Retrieves a specific source image by its ID.
 
 **Request:**
+
 ```http
 GET /api/images/<id>/
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 {
-    "id": 0,
-    "file_name": "string",
-    "description": "string",
-    "file": "string (url)",
-    "owner": 0,
-    "metadata": {},
-    "created_at": "2024-01-01T12:00:00Z",
-    "updated_at": "2024-01-01T12:00:00Z"
+  "id": 0,
+  "file_name": "string",
+  "description": "string",
+  "file": "string (url)",
+  "owner": 0,
+  "metadata": {},
+  "created_at": "2024-01-01T12:00:00Z",
+  "updated_at": "2024-01-01T12:00:00Z"
 }
 ```
 
@@ -351,6 +384,7 @@ GET /api/images/<id>/
 Uploads a new image. This is a `multipart/form-data` request.
 
 **Request:**
+
 ```http
 POST /api/images/upload/
 Content-Type: multipart/form-data
@@ -360,15 +394,17 @@ Content-Type: multipart/form-data
     "description": "string"
 }
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 {
-    "id": 0,
-    "file": "string (url)",
-    "file_name": "string",
-    "description": "string"
+  "id": 0,
+  "file": "string (url)",
+  "file_name": "string",
+  "description": "string"
 }
 ```
 
@@ -379,21 +415,24 @@ Content-Type: multipart/form-data
 Lists all transformed images owned by the user.
 
 **Request:**
+
 ```http
 GET /api/images/transformed/
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 [
-    {
-        "id": 0,
-        "file_name": "string",
-        "description": "string",
-        "file": "string (url)",
-        "owner": 0
-    }
+  {
+    "id": 0,
+    "file_name": "string",
+    "description": "string",
+    "file": "string (url)",
+    "owner": 0
+  }
 ]
 ```
 
@@ -404,24 +443,27 @@ GET /api/images/transformed/
 Retrieves a specific transformed image by its ID.
 
 **Request:**
+
 ```http
 GET /api/images/transformed/<id>/
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 {
-    "id": 0,
-    "file_name": "string",
-    "description": "string",
-    "file": "string (url)",
-    "owner": 0,
-    "metadata": {},
-    "created_at": "2024-01-01T12:00:00Z",
-    "updated_at": "2024-01-01T12:00:00Z",
-    "source_image": 0,
-    "transformation_task": 0
+  "id": 0,
+  "file_name": "string",
+  "description": "string",
+  "file": "string (url)",
+  "owner": 0,
+  "metadata": {},
+  "created_at": "2024-01-01T12:00:00Z",
+  "updated_at": "2024-01-01T12:00:00Z",
+  "source_image": 0,
+  "transformation_task": 0
 }
 ```
 
@@ -434,41 +476,77 @@ GET /api/images/transformed/<id>/
 Creates a new task to transform an image.
 
 **Request:**
+
 ```http
 POST /api/images/<id>/transform/
 Content-Type: application/json
 
 {
-    "transformations": {
-        "resize": {
-            "width": 100,
-            "height": 100
+    "format": "jpeg",
+    "transformations": [
+        {
+            "operation": "crop",
+            "params": {
+                "width": 800,
+                "height": 600,
+                "x": 100,
+                "y": 100
+            }
         },
-        "rotate": 90
-    },
-    "format": "JPEG"
+        {
+            "operation": "resize",
+            "params": {
+                "width": 1200,
+                "height": 1600
+            }
+        },
+        {
+            "operation": "rotate",
+            "params": {
+                "degrees": 180
+            }
+        },
+        {
+            "operation": "apply_filter",
+            "params": {
+                "grayscale": true,
+                "sepia": true,
+                "blur": true
+            }
+        },
+        {
+            "operation": "watermark",
+            "params": {
+                "watermark_text": "hello world"
+            }
+        },
+        {
+            "operation": "flip"
+        },
+        {
+            "operation": "mirror"
+        },
+    ]
 }
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 {
-    "id": 0,
-    "original_image": 0,
-    "result_image": null,
-    "status": "PENDING",
-    "transformations": {
-        "resize": {
-            "width": 100,
-            "height": 100
-        },
-        "rotate": 90
-    },
-    "format": "JPEG",
-    "created_at": "2024-01-01T12:00:00Z",
-    "updated_at": "2024-01-01T12:00:00Z",
-    "error_message": null
+  "id": 0,
+  "original_image": 0,
+  "result_image": null,
+  "status": "PENDING",
+  "transformations": {
+    ...
+  },
+  "format": "JPEG",
+  "created_at": "2024-01-01T12:00:00Z",
+  "updated_at": "2024-01-01T12:00:00Z",
+  "error_message": null
 }
 ```
 
@@ -479,25 +557,28 @@ Content-Type: application/json
 Lists all transformation tasks for the user.
 
 **Request:**
+
 ```http
 GET /api/tasks/
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 [
-    {
-        "id": 0,
-        "original_image": 0,
-        "result_image": 0,
-        "status": "string",
-        "transformations": {},
-        "format": "string",
-        "created_at": "2024-01-01T12:00:00Z",
-        "updated_at": "2024-01-01T12:00:00Z",
-        "error_message": "string"
-    }
+  {
+    "id": 0,
+    "original_image": 0,
+    "result_image": 0,
+    "status": "string",
+    "transformations": {},
+    "format": "string",
+    "created_at": "2024-01-01T12:00:00Z",
+    "updated_at": "2024-01-01T12:00:00Z",
+    "error_message": "string"
+  }
 ]
 ```
 
@@ -508,22 +589,25 @@ GET /api/tasks/
 Retrieves a specific transformation task by its ID.
 
 **Request:**
+
 ```http
 GET /api/tasks/<id>/
 ```
-*(Requires authentication)*
+
+_(Requires authentication)_
 
 **Response:**
+
 ```json
 {
-    "id": 0,
-    "original_image": 0,
-    "result_image": 0,
-    "status": "string",
-    "transformations": {},
-    "format": "string",
-    "created_at": "2024-01-01T12:00:00Z",
-    "updated_at": "2024-01-01T12:00:00Z",
-    "error_message": "string"
+  "id": 0,
+  "original_image": 0,
+  "result_image": 0,
+  "status": "string",
+  "transformations": {},
+  "format": "string",
+  "created_at": "2024-01-01T12:00:00Z",
+  "updated_at": "2024-01-01T12:00:00Z",
+  "error_message": "string"
 }
-``` 
+```
