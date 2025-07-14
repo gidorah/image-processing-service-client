@@ -5,6 +5,7 @@ import { SourceImageType } from "@/lib/types";
 import Image from "next/image";
 import { getSourceImageDetails } from "@/lib/api";
 import React from "react";
+import TransformationForm from "@/components/image/transformation-form";
 
 export default function ImageDetailPage({
   params,
@@ -38,7 +39,7 @@ export default function ImageDetailPage({
   }
 
   return (
-    <div className="flex items-center justify-center rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
+    <div className="flex items-center justify-center gap-12 rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
       <Image
         src={image.file}
         alt={image.fileName || "Uploaded image"}
@@ -46,6 +47,7 @@ export default function ImageDetailPage({
         height={500}
         className="max-h-[70vh] rounded-lg object-contain"
       />
+      <TransformationForm imageId={imageId} />
     </div>
   );
 }

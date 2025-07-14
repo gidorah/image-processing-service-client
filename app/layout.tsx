@@ -4,6 +4,7 @@ import Header from "@/components/shared/header";
 import Footer from "@/components/shared/footer";
 import Providers from "./providers";
 import { Toaster } from "@/components/ui/sonner";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +28,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <Script
+          src="https://unpkg.com/@styleglide/theme-editor@1.0.0"
+          integrity="sha384-<INSERT_COMPUTED_HASH_FOR_V1.0.0>"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

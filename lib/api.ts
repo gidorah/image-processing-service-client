@@ -1,6 +1,7 @@
 import useAuthStore from "@/store/authStore";
 import axios, { AxiosError } from "axios";
-import { SourceImageType, User } from "./types";
+import { SourceImageType, TransformationTask, User } from "./types";
+import { TransformRequest } from "./validators";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api",
@@ -81,6 +82,25 @@ export const getSourceImageDetails = async (
   id: number
 ): Promise<SourceImageType> => {
   const response = await api.get(`/images/${id}/`);
+  return response.data;
+};
+
+/**
+ * Triggers a transformation task on API by posting
+ * list transformations on the source image by its ID.
+ * @param id - The ID of the source image to transformed.
+ * @param data - Transformations that will be applied and output format.
+ * @returns {Promise<TransformationTask>} - A promise that resolves to the created transformation task details.
+ */
+
+export const transformImage = async ({
+  id,
+  data,
+}: {
+  id: number;
+  data: TransformRequest;
+}): Promise<TransformationTask> => {
+  const response = await api.post(`/images/${id}/transform/`, data);
   return response.data;
 };
 

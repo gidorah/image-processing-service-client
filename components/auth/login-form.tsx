@@ -31,6 +31,13 @@ export function LoginForm({
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
+    defaultValues:
+      process.env.NODE_ENV === "development"
+        ? {
+            email: process.env.NEXT_PUBLIC_TEST_LOGIN_EMAIL || "",
+            password: process.env.NEXT_PUBLIC_TEST_LOGIN_PASSWORD || "",
+          }
+        : {},
   });
 
   const loginMutation = useMutation({
