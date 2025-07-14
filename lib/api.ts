@@ -88,7 +88,7 @@ export const getSourceImageDetails = async (
 /**
  * Triggers a transformation task on API by posting
  * list transformations on the source image by its ID.
- * @param id - The ID of the source image to tbe transformed.
+ * @param id - The ID of the source image to transformed.
  * @param data - Transformations that will be applied and output format.
  * @returns {Promise<TransformationTask>} - A promise that resolves to the created transformation task details.
  */

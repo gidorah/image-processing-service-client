@@ -21,7 +21,6 @@ import {
 } from "@/lib/validators";
 import { Control, UseFormWatch } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { transformImage } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -406,7 +405,9 @@ export default function TransformationForm({ imageId }: { imageId: number }) {
       console.log(data);
     },
     onError: (error) => {
-      toast.error(`Transform Image Failed: ${error}`);
+      toast.error(
+        `Transform Image Failed: ${error instanceof Error ? error.message : "An unexpected error occurred"}`
+      );
     },
   });
 

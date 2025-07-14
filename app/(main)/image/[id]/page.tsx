@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { SourceImageType, Metadata } from "@/lib/types";
+import { SourceImageType } from "@/lib/types";
 import Image from "next/image";
 import { getSourceImageDetails } from "@/lib/api";
 import React from "react";
