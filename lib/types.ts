@@ -7,6 +7,12 @@ export interface User {
 }
 
 /**
+ * Represents the structure of an Image Metadata.
+ * TODO: Could be detailed later
+ */
+export type Metadata = Record<string, unknown>;
+
+/**
  * The base interface for all image types, corresponding to the BaseImage model.
  */
 export interface BaseImageType {
@@ -31,4 +37,19 @@ export type SourceImageType = BaseImageType;
 export interface TransformedImageType extends BaseImageType {
   sourceImage: number;
   transformationTask: number;
+}
+
+/**
+ * Represents a TransformationTask from the API.
+ */
+export interface TransformationTask {
+  id: number;
+  status: "PENDING" | "SUCCESS" | "FAILURE";
+  format: string;
+  transformations: Record<string, unknown>;
+  original_image: number;
+  result_image: number | null;
+  created_at: string;
+  updated_at: string;
+  error_message: string | null;
 }

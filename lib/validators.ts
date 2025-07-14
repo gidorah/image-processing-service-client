@@ -61,6 +61,7 @@ export const transformRequestSchema = z.object({
   format: formatSchema.optional(),
   transformations: z.array(transformationSchema).min(1),
 });
+export type Transformation = z.infer<typeof transformationSchema>;
 export type TransformRequest = z.infer<typeof transformRequestSchema>;
 
 /**
@@ -81,7 +82,8 @@ export const transformationFormSchema = z.object({
   }),
   resize: z.object({
     active: z.boolean(),
-    scale: z.number().min(0.2).max(5).step(0.2),
+    width: z.number().positive(),
+    height: z.number().positive(),
   }),
   rotate: rotateParamsSchema
     .extend({
@@ -94,7 +96,7 @@ export const transformationFormSchema = z.object({
     blur: z.boolean(),
   }),
   watermark: watermarkParamsSchema.extend({
-    active: z.boolean(),
+    watermark_text: z.string(),
   }),
   flip: z.boolean(),
   mirror: z.boolean(),

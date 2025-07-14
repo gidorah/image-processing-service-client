@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { SourceImageType } from "@/lib/types";
+import { SourceImageType, Metadata } from "@/lib/types";
 import Image from "next/image";
 import { getSourceImageDetails } from "@/lib/api";
 import React from "react";
@@ -47,7 +47,7 @@ export default function ImageDetailPage({
         height={500}
         className="max-h-[70vh] rounded-lg object-contain"
       />
-      <TransformationForm />
+      <TransformationForm imageId={imageId} />
     </div>
   );
 }
