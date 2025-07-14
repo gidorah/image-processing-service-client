@@ -85,11 +85,9 @@ export const transformationFormSchema = z.object({
     width: z.number().positive(),
     height: z.number().positive(),
   }),
-  rotate: rotateParamsSchema
-    .extend({
-      active: z.boolean(),
-    })
-    .required(),
+  rotate: rotateParamsSchema.extend({
+    active: z.boolean(),
+  }),
   filters: z.object({
     grayscale: z.boolean(),
     sepia: z.boolean(),
