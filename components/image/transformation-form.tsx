@@ -27,20 +27,26 @@ import { toast } from "sonner";
 const AccordionContentClasses = "m-3 flex flex-col gap-4";
 const SectionClasses = "flex flex-col gap-4 group";
 
-function ParameterSlider(props: React.ComponentProps<typeof Slider>) {
+function ParameterSlider({
+  title,
+  ...props
+}: Omit<React.ComponentProps<typeof Slider>, "title"> & { title: string }) {
   return (
     <div className="group flex flex-col gap-4" data-disabled={props.disabled}>
-      <Label htmlFor={props.id}>{props.title}</Label>
+      <Label htmlFor={props.id}>{title}</Label>
       <Slider className={cn("w-full")} {...props} />
     </div>
   );
 }
 
-function ParameterSwitch(props: React.ComponentProps<typeof Switch>) {
+function ParameterSwitch({
+  title,
+  ...props
+}: Omit<React.ComponentProps<typeof Switch>, "title"> & { title: string }) {
   return (
     <div className="flex flex-row gap-4">
       <Switch {...props} />
-      <Label htmlFor={props.id}>{props.title}</Label>
+      <Label htmlFor={props.id}>{title}</Label>
     </div>
   );
 }
