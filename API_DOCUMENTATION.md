@@ -611,3 +611,49 @@ _(Requires authentication)_
   "error_message": "string"
 }
 ```
+
+## Frontend API Functions
+
+The frontend provides several utility functions in `lib/api.ts` for interacting with the API:
+
+### Authentication Functions
+
+- `checkAuthStatus()` - Verifies if user is authenticated and returns user data
+- `logoutUser()` - Logs out the current user
+
+### Image Management Functions
+
+- `uploadImage(image: File)` - Uploads an image file and returns the image ID
+- `getSourceImageDetails(id: number)` - Fetches details for a specific source image
+
+### Transformation Functions
+
+- `transformImage({ id, data })` - Creates a new transformation task for an image
+- `getImageTransformationTasks(imageId: number)` - Fetches all transformation tasks for a specific image
+- `getTransformationTask(taskId: number)` - Fetches details for a specific transformation task
+
+### Usage Examples
+
+```typescript
+// Upload an image
+const result = await uploadImage(imageFile);
+console.log("Image uploaded with ID:", result.id);
+
+// Get transformation tasks for an image
+const tasks = await getImageTransformationTasks(123);
+console.log("Found", tasks.length, "transformation tasks");
+
+// Poll a specific task for status updates
+const task = await getTransformationTask(456);
+if (task.status === "PENDING") {
+  // Continue polling...
+}
+```
+
+### Error Handling
+
+All API functions include proper error handling:
+
+- Network errors are caught and can be handled by the calling component
+- 401 Unauthorized responses trigger automatic logout via axios interceptor
+- API errors include descriptive error messages for user feedback
