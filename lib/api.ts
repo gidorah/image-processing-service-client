@@ -118,7 +118,22 @@ export const getImageTransformationTasks = async (
   imageId: number
 ): Promise<TransformationTask[]> => {
   const response = await api.get("/tasks/");
-  const allTasks: TransformationTask[] = response.data;
+  const responseData = response.data;
+
+  // Handle different response formats
+  let allTasks: TransformationTask[];
+  if (Array.isArray(responseData)) {
+    allTasks = responseData;
+  } else if (responseData && Array.isArray(responseData.results)) {
+    // Handle paginated response
+    allTasks = responseData.results;
+  } else if (responseData && typeof responseData === "object") {
+    // Handle single object response
+    allTasks = [responseData];
+  } else {
+    // Fallback to empty array
+    allTasks = [];
+  }
 
   // Filter tasks to only include those for the specified image
   return allTasks.filter((task) => task.original_image === imageId);
