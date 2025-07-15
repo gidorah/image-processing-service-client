@@ -420,6 +420,11 @@ export default function TransformationForm({ imageId }: { imageId: number }) {
   function onSubmit(formData: TransformationFormValues) {
     const requestData = buildTransformationRequest(formData);
 
+    if (requestData.transformations.length === 0) {
+      toast.error("No transformations selected");
+      return;
+    }
+
     processImage({ id: imageId, data: requestData });
   }
 
