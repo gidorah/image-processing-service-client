@@ -1,0 +1,25 @@
+{
+  "enabled": true,
+  "name": "Documentation Sync",
+  "description": "Listens to TypeScript source files, configuration files, and other relevant project files. When changes are committed, automatically updates documentation in README.md and API_DOCUMENTATION.md to reflect the latest code changes.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered",
+    "patterns": [
+      "**/*.ts",
+      "**/*.tsx",
+      "package.json",
+      "tsconfig.json",
+      "next.config.ts",
+      "middleware.ts",
+      "components.json",
+      "eslint.config.mjs",
+      "postcss.config.mjs",
+      ".prettierrc.cjs"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Source files have been updated in this Next.js TypeScript project. Please review the changes and update the documentation accordingly:\n\n1. Update README.md to reflect any new features, components, or architectural changes\n2. Update API_DOCUMENTATION.md if there are API-related changes in lib/api.ts or new endpoints\n3. Ensure documentation accurately describes the current state of the codebase\n4. Update any setup instructions, dependencies, or configuration details if they've changed\n\nFocus on keeping the documentation clear, accurate, and helpful for developers working with this image processing frontend application."
+  }
+}
