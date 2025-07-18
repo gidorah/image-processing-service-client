@@ -19,7 +19,7 @@ This feature adds a transformations section to the Image Detail Page that displa
 
 ### Requirement 2
 
-**User Story:** As a user with multiple transformations on an image, I want to scroll horizontally through transformation cards, so that I can view all transformations even when there are many.
+**User Story:** As a user with multiple transformation tasks on an image, I want to scroll horizontally through transformation cards, so that I can view all transformation tasks even when there are many.
 
 #### Acceptance Criteria
 
@@ -34,11 +34,11 @@ This feature adds a transformations section to the Image Detail Page that displa
 
 #### Acceptance Criteria
 
-1. WHEN displaying a transformation card THEN the system SHALL show the transformation type (resize, grayscale, etc.)
+1. WHEN displaying a transformation card THEN the system SHALL show the transformations list applied to the image.
 2. WHEN displaying a transformation card THEN the system SHALL show the current processing status
 3. WHEN displaying a transformation card THEN the system SHALL show the creation timestamp
 4. WHEN a transformation has parameters THEN the system SHALL display relevant parameter information
-5. WHEN a transformation is completed THEN the system SHALL show a preview thumbnail if available
+5. WHEN a transformation task is completed THEN the system SHALL show a preview thumbnail if available
 
 ### Requirement 4
 
@@ -46,11 +46,12 @@ This feature adds a transformations section to the Image Detail Page that displa
 
 #### Acceptance Criteria
 
-1. WHEN a transformation is pending THEN the system SHALL display a loading indicator and pending status
-2. WHEN a transformation is in progress THEN the system SHALL show a progress indicator if available
-3. WHEN a transformation is completed THEN the system SHALL display a success state with result preview
-4. WHEN a transformation has failed THEN the system SHALL show an error state with appropriate messaging
-5. WHEN displaying status THEN the system SHALL use consistent visual styling for each state
+1. WHEN a transformation task is pending THEN the system SHALL display a loading indicator and pending status
+2. WHEN a transformation task is in progress THEN the system SHALL show a progress indicator if available
+3. WHEN a transformation task is completed THEN the system SHALL display a success state with result preview
+4. WHEN a transformation task has failed THEN the system SHALL show an error state with appropriate messaging
+5. WHEN a transformation task has cancelled THEN the system SHALL show an cancel state with appropriate messaging
+6. WHEN displaying status THEN the system SHALL use consistent visual styling for each state
 
 ### Requirement 5
 
@@ -58,7 +59,7 @@ This feature adds a transformations section to the Image Detail Page that displa
 
 #### Acceptance Criteria
 
-1. WHEN a transformation is completed THEN the system SHALL make the card clickable to view results
+1. WHEN a transformation task is completed THEN the system SHALL make the card clickable to view results
 2. WHEN clicking a completed transformation card THEN the system SHALL navigate to the result page
 3. WHEN hovering over a clickable card THEN the system SHALL provide visual feedback
 4. WHEN a transformation is not completed THEN the system SHALL disable card interaction
@@ -75,3 +76,15 @@ This feature adds a transformations section to the Image Detail Page that displa
 3. WHEN viewing on mobile THEN the system SHALL ensure cards remain readable and interactive
 4. WHEN the viewport changes THEN the system SHALL maintain horizontal scroll functionality
 5. WHEN displaying on any device THEN the system SHALL ensure text and images remain legible
+
+### Requirement 7
+
+**User Story:** As a user who has just submitted a new transformation request, I want to see the updated list of transformation tasks immediately, so that I can track my newly created transformation without manually refreshing the page.
+
+#### Acceptance Criteria
+
+1. WHEN the Process Image button is clicked THEN the system SHALL submit the transformation form
+2. WHEN the transformation form is submitted successfully THEN the system SHALL refresh the transformation tasks list automatically
+3. WHEN the transformation tasks are refreshed THEN the system SHALL display the newly created transformation task
+4. WHEN refreshing transformation tasks THEN the system SHALL maintain the current scroll position if possible
+5. WHEN the refresh fails THEN the system SHALL display an appropriate error message while keeping existing tasks visible

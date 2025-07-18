@@ -1,13 +1,13 @@
 # Implementation Plan
 
-- [ ] 1. Add missing UI components for transformations display
+- [x] 1. Add missing UI components for transformations display
 
   - Add Badge component from shadcn/ui for status indicators
   - Add Progress component from shadcn/ui for in-progress transformations
   - Add Skeleton component from shadcn/ui for loading states
   - _Requirements: 3.2, 4.1, 4.2, 4.3_
 
-- [ ] 2. Extend API layer with transformation task functions
+- [x] 2. Extend API layer with transformation task functions
 
   - Add getImageTransformations function to fetch all transformation tasks for an image
   - Add getTransformationTask function to fetch individual task details

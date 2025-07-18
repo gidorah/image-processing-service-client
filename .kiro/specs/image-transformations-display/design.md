@@ -24,8 +24,9 @@ ImageDetailPage
 
 1. **Initial Load**: Page component fetches image data and transformation tasks via API
 2. **Real-time Updates**: Polling mechanism updates transformation statuses
-3. **User Interaction**: Card clicks navigate to result pages
-4. **Responsive Adaptation**: Layout adjusts based on viewport size
+3. **Form Integration**: Transformation form submission triggers automatic refresh of tasks list
+4. **User Interaction**: Card clicks navigate to result pages
+5. **Responsive Adaptation**: Layout adjusts based on viewport size
 
 ## Components and Interfaces
 
@@ -73,31 +74,86 @@ interface TransformationCardProps {
 - `Progress` for in-progress transformations
 - `Skeleton` for loading states
 
+**Transformations Display Logic**:
+
+The `transformations` field contains a Record<string, unknown> with transformation parameters. The display logic should be dynamic and extensible to handle any transformation type:
+
+```typescript
+// Dynamic transformation parsing
+const parseTransformations = (transformations: Record<string, unknown>) => {
+  return Object.entries(transformations)
+    .map(([key, value]) => {
+      // Capitalize the transformation name
+      const displayName = key.charAt(0).toUpperCase() + key.slice(1);
+
+      // Handle different value types dynamically
+      if (typeof value === "boolean") {
+        return value ? displayName : null; // Only show if true
+      } else if (typeof value === "object" && value !== null) {
+        // For complex objects, show key properties
+        const props = Object.entries(value as Record<string, any>)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join(", ");
+        return `${displayName}: ${props}`;
+      } else {
+        return `${displayName}: ${value}`;
+      }
+    })
+    .filter(Boolean); // Remove null values
+};
+```
+
+**Design Rationale**: This approach is transformation-agnostic and will automatically adapt to new transformation types without requiring code changes. It provides readable output for any transformation structure while maintaining flexibility for future extensions.
+
 **Visual States**:
 
 - **Pending**: Loading spinner using `Skeleton`, muted colors, disabled interaction
 - **In Progress**: `Progress` component, animated elements, disabled interaction
 - **Completed**: Success styling with `Badge`, preview thumbnail, clickable `Card`
 - **Failed**: Error styling with `Badge`, error message, disabled interaction
+- **Cancelled**: Warning styling with `Badge`, cancelled message, disabled interaction
+
+### Form Integration Component
+
+**Purpose**: Handles communication between transformation form and transformations list
+
+**Design Rationale**: To satisfy Requirement 7, we need a mechanism to automatically refresh the transformations list when a new transformation is submitted. This is achieved through a callback-based approach that maintains loose coupling between the form and the transformations display.
+
+**Integration Pattern**:
+
+```typescript
+interface FormIntegrationProps {
+  onTransformationSubmitted: () => void;
+}
+
+// Usage in Image Detail Page
+const handleTransformationSubmit = useCallback(() => {
+  // Trigger refresh of transformations list
+  refetchTransformations();
+}, [refetchTransformations]);
+```
+
+**Key Features**:
+
+- Automatic refresh trigger after successful form submission
+- Scroll position preservation during refresh when possible
+- Error handling for failed refresh attempts
+- Optimistic updates for immediate user feedback
 
 ### Data Models
 
 ```typescript
-interface TransformationTask {
-  id: string;
-  imageId: string;
-  type: TransformationType;
-  status: "pending" | "in_progress" | "completed" | "failed";
-  parameters: Record<string, any>;
-  createdAt: string;
-  completedAt?: string;
-  resultUrl?: string;
-  thumbnailUrl?: string;
-  errorMessage?: string;
-  progress?: number;
+export interface TransformationTask {
+  id: number;
+  status: "PENDING" | "IN_PROGRESS" | "SUCCESS" | "FAILED" | "CANCELLED";
+  format: string;
+  transformations: Record<string, unknown>;
+  original_image: number;
+  result_image: number | null;
+  created_at: string;
+  updated_at: string;
+  error_message: string | null;
 }
-
-type TransformationType = "resize" | "grayscale" | "blur" | "rotate" | "crop";
 ```
 
 ## User Interface Design
@@ -136,8 +192,10 @@ type TransformationType = "resize" | "grayscale" | "blur" | "rotate" | "crop";
 │ │   Preview/Icon      │ │
 │ │                     │ │
 │ └─────────────────────┘ │
-│ Transformation Type     │
-│ Parameters Summary      │
+│ Transformations List    │
+│ • Resize: 800x600      │
+│ • Grayscale            │
+│ • Format: JPEG         │
 │ Timestamp              │
 │ Progress/Status        │
 └─────────────────────────┘
