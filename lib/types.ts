@@ -44,7 +44,7 @@ export interface TransformedImageType extends BaseImageType {
  */
 export interface TransformationTask {
   id: number;
-  status: "PENDING" | "SUCCESS" | "FAILURE";
+  status: "PENDING" | "IN_PROGRESS" | "SUCCESS" | "FAILED" | "CANCELLED";
   format: string;
   transformations: Record<string, unknown>;
   original_image: number;

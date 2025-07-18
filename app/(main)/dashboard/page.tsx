@@ -1,6 +1,14 @@
+"use client";
+
 import ImageUploader from "@/components/dashboard/image-uploader";
+// import { getImageTransformations } from "@/lib/api";
 
 export default function Dashboard() {
+  // const testFunction = async () => {
+  //   const result = await getImageTransformations(37);
+  //   console.log(result);
+  // };
+
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-lg p-4">
@@ -12,6 +20,9 @@ export default function Dashboard() {
         </p>
         <ImageUploader />
       </div>
+      {/* <div>
+        <button onClick={testFunction}>Test API Function</button>
+      </div> */}
     </div>
   );
 }

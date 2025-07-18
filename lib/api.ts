@@ -104,4 +104,32 @@ export const transformImage = async ({
   return response.data;
 };
 
+/**
+ * Fetches all transformation tasks associated with a source image by its ID.
+ * @param imageId - The ID of the source image to fetch transformations for.
+ * @returns  {Promise<TransformationTask[]>} - A promise that resolves to an array of transformation tasks.
+ */
+export const getImageTransformations = async (
+  imageId: number
+): Promise<TransformationTask[]> => {
+  const response = await api.get("/tasks/");
+  const results = response.data.results as TransformationTask[];
+
+  // Since tasks endpoint returns all tasks of user
+  // we should filter them by source image
+  return results.filter((task) => task.original_image === imageId);
+};
+
+/**
+ * Fetches the details of a transformation task by its ID.
+ * @param taskId - The ID of the transformation task to fetch.
+ * @returns {Promise<TransformationTask>} - A promise that resolves to the transformation task details.
+ */
+export const getTransformationTask = async (
+  taskId: number
+): Promise<TransformationTask> => {
+  const response = await api.get(`/tasks/${taskId}/`);
+  return response.data;
+};
+
 export default api;
