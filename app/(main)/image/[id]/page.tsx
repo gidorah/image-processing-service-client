@@ -6,6 +6,7 @@ import Image from "next/image";
 import { getSourceImageDetails } from "@/lib/api";
 import React from "react";
 import TransformationForm from "@/components/image/transformation-form";
+import { TransformationsSection } from "@/components/image";
 
 export default function ImageDetailPage({
   params,
@@ -39,15 +40,18 @@ export default function ImageDetailPage({
   }
 
   return (
-    <div className="flex items-center justify-center gap-12 rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
-      <Image
-        src={image.file}
-        alt={image.fileName || "Uploaded image"}
-        width={500}
-        height={500}
-        className="max-h-[70vh] rounded-lg object-contain"
-      />
-      <TransformationForm imageId={imageId} />
+    <div>
+      <div className="flex items-center justify-center gap-12 rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
+        <Image
+          src={image.file}
+          alt={image.fileName || "Uploaded image"}
+          width={500}
+          height={500}
+          className="max-h-[70vh] rounded-lg object-contain"
+        />
+        <TransformationForm imageId={imageId} />
+      </div>
+      <TransformationsSection imageId={imageId} />
     </div>
   );
 }

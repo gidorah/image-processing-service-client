@@ -8,13 +8,12 @@ import TransformationCard, {
 import { Button } from "@/components/ui/button";
 import { RefreshCw, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { getImageTransformations } from "@/lib/api";
 
 interface TransformationsSectionProps {
-  imageId: string;
-  transformations: TransformationTask[];
-  isLoading: boolean;
-  onRefresh?: () => void;
-  onCardClick?: (taskId: string) => void;
+  imageId: number;
+  onFormSubmissionSuccess?: () => void;
 }
 
 /**
@@ -23,19 +22,51 @@ interface TransformationsSectionProps {
  */
 export default function TransformationsSection({
   imageId,
-  transformations,
-  isLoading,
-  onRefresh,
-  onCardClick,
+  onFormSubmissionSuccess,
 }: TransformationsSectionProps) {
+  const {
+    data: transformations,
+    error,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["transformations", imageId],
+    queryFn: () => getImageTransformations(imageId),
+    refetchInterval: (query) => {
+      const hasIncomplete = query.state.data?.some((task) => {
+        return task.status === "IN_PROGRESS" || task.status === "PENDING";
+      });
+      return hasIncomplete ? 2000 : false;
+    },
+    refetchIntervalInBackground: false, // We don't want refetch when tab is inactive
+    retry: (failureCount) => {
+      return failureCount < 3;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
+
+  const onRefresh = false;
+
+  const handleCardClick = () => {
+    console.log("someting");
+  };
+
+  if (isError) {
+    console.log("bloaff: ", error);
+    return;
+  }
+
+  if (isLoading) {
+    console.log("loading");
+    return;
+  }
+
+  if (transformations === undefined) {
+    return;
+  }
+
   const hasTransformations = transformations.length > 0;
   const showScrollIndicators = hasTransformations && transformations.length > 1;
-
-  const handleCardClick = (taskId: string) => {
-    if (onCardClick) {
-      onCardClick(taskId);
-    }
-  };
 
   return (
     <section
