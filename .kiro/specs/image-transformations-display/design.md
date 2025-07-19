@@ -22,39 +22,84 @@ ImageDetailPage
 
 ### Data Flow
 
-1. **Initial Load**: Page component fetches image data and transformation tasks via API
-2. **Real-time Updates**: Polling mechanism updates transformation statuses
-3. **Form Integration**: Transformation form submission triggers automatic refresh of tasks list
+1. **Initial Load**: TransformationsSection fetches transformation tasks via single API call
+2. **Centralized Polling**: TransformationsSection manages polling for all incomplete tasks with smart intervals
+3. **Form Integration**: Transformation form submission triggers automatic refresh with retry mechanism
 4. **User Interaction**: Card clicks navigate to result pages
 5. **Responsive Adaptation**: Layout adjusts based on viewport size
+
+### Data Management Architecture
+
+**Centralized Approach**: TransformationsSection owns all data fetching and state management to optimize performance for high-volume usage scenarios.
+
+**Key Design Decisions**:
+
+- Single API call fetches complete task list (no individual task fetching needed)
+- Centralized polling reduces server load and improves efficiency
+- Form integration through callback-based refresh mechanism
+- No optimistic updates - wait for server confirmation
 
 ## Components and Interfaces
 
 ### TransformationsSection Component
 
-**Purpose**: Main container component that orchestrates the transformations display
+**Purpose**: Main container component that owns all transformation data management and orchestrates the display
 
 **Props**:
 
 ```typescript
 interface TransformationsSectionProps {
-  imageId: string;
-  transformations: TransformationTask[];
-  isLoading: boolean;
-  onRefresh?: () => void;
+  imageId: number;
+  onFormSubmissionSuccess?: () => void; // Callback for form integration
 }
 ```
 
 **Responsibilities**:
 
-- Manage loading states
-- Handle empty state display
-- Coordinate horizontal scrolling behavior
-- Provide refresh functionality
+- **Data Management**: Fetch transformation tasks via `getImageTransformations` API
+- **Centralized Polling**: Manage polling for incomplete tasks with smart intervals
+- **State Management**: Handle loading, error, and empty states
+- **Form Integration**: Provide callback mechanism for form submission refresh
+- **UI Orchestration**: Coordinate horizontal scrolling and responsive behavior
+
+**Data Fetching Strategy**:
+
+```typescript
+// React Query implementation
+const {
+  data: transformations,
+  isLoading,
+  error,
+  refetch,
+} = useQuery({
+  queryKey: ["transformations", imageId],
+  queryFn: () => getImageTransformations(imageId),
+  refetchInterval: (data) => {
+    // Smart polling: only poll if there are incomplete tasks
+    const hasIncomplete = data?.some(
+      (task) => task.status === "PENDING" || task.status === "IN_PROGRESS"
+    );
+    return hasIncomplete ? 2000 : false; // 2 seconds for active processing
+  },
+  refetchIntervalInBackground: false, // Pause when tab inactive
+  retry: (failureCount, error) => {
+    // Exponential backoff for polling failures
+    return failureCount < 3;
+  },
+  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+});
+```
+
+**Polling Strategy**:
+
+- **Active Processing**: 2-3 second intervals when tasks are IN_PROGRESS or PENDING
+- **Background Pause**: Automatically pause polling when tab/window becomes inactive
+- **Error Handling**: Silent retry with exponential backoff, max 3 attempts
+- **Smart Termination**: Stop polling when all tasks are completed
 
 ### TransformationCard Component
 
-**Purpose**: Individual card displaying transformation task information
+**Purpose**: Pure presentation component for displaying individual transformation task information
 
 **Props**:
 
@@ -65,6 +110,8 @@ interface TransformationCardProps {
   isClickable: boolean;
 }
 ```
+
+**Design Philosophy**: TransformationCard is a pure presentation component that receives all necessary data from its parent. It does not perform any API calls or manage its own state, ensuring optimal performance and simplicity.
 
 **shadcn/ui Components Used**:
 
@@ -113,32 +160,47 @@ const parseTransformations = (transformations: Record<string, unknown>) => {
 - **Failed**: Error styling with `Badge`, error message, disabled interaction
 - **Cancelled**: Warning styling with `Badge`, cancelled message, disabled interaction
 
-### Form Integration Component
+### Form Integration Pattern
 
-**Purpose**: Handles communication between transformation form and transformations list
+**Purpose**: Seamless communication between transformation form and transformations list
 
-**Design Rationale**: To satisfy Requirement 7, we need a mechanism to automatically refresh the transformations list when a new transformation is submitted. This is achieved through a callback-based approach that maintains loose coupling between the form and the transformations display.
+**Design Rationale**: To satisfy Requirement 7, the form submission success triggers an immediate refresh of the transformations list. This is achieved through a callback-based approach that maintains loose coupling between components.
 
 **Integration Pattern**:
 
 ```typescript
-interface FormIntegrationProps {
-  onTransformationSubmitted: () => void;
-}
+// In Image Detail Page
+const handleFormSubmissionSuccess = useCallback(() => {
+  // TransformationsSection will handle the refresh internally
+  transformationsSectionRef.current?.refreshTransformations();
+}, []);
 
-// Usage in Image Detail Page
-const handleTransformationSubmit = useCallback(() => {
-  // Trigger refresh of transformations list
-  refetchTransformations();
-}, [refetchTransformations]);
+// TransformationsSection exposes refresh method
+const refreshTransformations = useCallback(async () => {
+  try {
+    await refetch();
+  } catch (error) {
+    // Retry mechanism for failed refresh after form submission
+    setTimeout(() => refetch(), 2000);
+  }
+}, [refetch]);
 ```
 
 **Key Features**:
 
-- Automatic refresh trigger after successful form submission
-- Scroll position preservation during refresh when possible
-- Error handling for failed refresh attempts
-- Optimistic updates for immediate user feedback
+- **No Optimistic Updates**: Wait for server response before showing new transformations
+- **Automatic Retry**: If refresh fails after form submission, retry automatically
+- **Concurrent Safety**: Form submission during active polling is handled gracefully
+- **Error Resilience**: Silent error handling with retry mechanism
+
+**Form Submission Flow**:
+
+1. User submits transformation form
+2. Form waits for server response (no optimistic updates)
+3. On success, form triggers TransformationsSection refresh
+4. TransformationsSection refetches data immediately
+5. If refresh fails, automatic retry after 2 seconds
+6. New transformation appears in list once successfully fetched
 
 ### Data Models
 
@@ -226,10 +288,22 @@ export interface TransformationTask {
 
 ### API Error Scenarios
 
-1. **Network Failures**: Display retry mechanism with exponential backoff
-2. **Authentication Errors**: Redirect to login page
+1. **Polling Failures**: Silent retry with exponential backoff (max 3 attempts)
+2. **Authentication Errors**: Redirect to login page via global interceptor
 3. **Not Found Errors**: Show appropriate empty state
-4. **Server Errors**: Display user-friendly error message with refresh option
+4. **Server Errors**: Display user-friendly error message with manual refresh option
+5. **Form Refresh Failures**: Automatic retry after 2 seconds, then manual refresh option
+
+### Polling Error Handling
+
+**Silent Error Strategy**: Polling errors are handled silently to avoid disrupting user experience during high-traffic periods when servers may be temporarily unavailable.
+
+**Exponential Backoff**:
+
+- 1st retry: 1 second delay
+- 2nd retry: 2 second delay
+- 3rd retry: 4 second delay
+- After 3 failures: Stop polling, show manual refresh option
 
 ### Loading States
 
@@ -289,10 +363,19 @@ export interface TransformationTask {
 
 **Optimization Strategies**:
 
-- Lazy loading for transformation thumbnails
-- Virtualization for large numbers of transformations
-- Debounced polling to reduce API calls
-- Memoization of card components to prevent unnecessary re-renders
+- **Centralized Data Fetching**: Single API call instead of N individual calls
+- **Smart Polling**: Only poll when incomplete tasks exist, pause when tab inactive
+- **Efficient Updates**: React Query caching prevents unnecessary re-renders
+- **Memoization**: Card components memoized to prevent re-renders on polling updates
+- **Virtualization**: For very large transformation lists (100+ items)
+- **Background Optimization**: Polling pauses when browser tab becomes inactive
+
+**High-Volume Performance**:
+
+- Designed for scenarios with many transformations per user
+- Optimized for high server load with queued (pending) tasks
+- Reduced API calls minimize server impact during peak usage
+- Exponential backoff prevents polling storms during server issues
 
 **Monitoring**:
 
@@ -307,9 +390,9 @@ export interface TransformationTask {
 
 **Next.js App Router**:
 
-- Server-side rendering for initial transformation data
-- Client-side updates via React Query
-- Optimistic updates for better UX
+- Client-side data fetching via React Query (no SSR for transformations)
+- Centralized polling for real-time updates
+- No optimistic updates - server-confirmed data only
 
 **Styling Approach**:
 

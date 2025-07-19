@@ -16,7 +16,7 @@
 
 - [x] 3. Create TransformationCard component
 
-  - Implement card component with all visual states (pending, in-progress, completed, failed)
+  - Implement card component with all visual states (pending, in-progress, completed, failed, cancelled)
   - Add status indicators using Badge component
   - Include transformation type, parameters, and timestamp display
   - Implement click handling for completed transformations
@@ -32,21 +32,21 @@
   - Include scroll indicators and touch-friendly scrolling
   - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 2.3, 2.4, 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [-] 5. Integrate TransformationsSection into Image Detail Page
+- [x] 5. Add unit and integration tests for components
 
-  - Add TransformationsSection component below the main image display
-  - Implement data fetching for transformation tasks using React Query
-  - Add error handling and loading states
-  - Ensure proper layout and spacing with existing components
-  - _Requirements: 1.1, 1.4_
+  - Write unit tests for TransformationCard component with all visual states
+  - Write unit tests for TransformationsSection component behavior
+  - Create tests for responsive behavior and user interactions
+  - _Requirements: All requirements validation through testing_
 
-- [ ] 6. Implement real-time status updates
+- [x] 6. Integrate TransformationsSection with data fetching and real-time updates
 
+  - Integrate TransformationsSection into Image Detail Page with React Query
   - Add polling mechanism for transformation task status updates
-  - Implement optimistic updates for better user experience
+  - Implement form submission success callback to refresh transformations list
   - Add proper error handling for polling failures
   - Ensure efficient polling with proper intervals and cleanup
-  - _Requirements: 4.1, 4.2, 4.3, 4.4_
+  - _Requirements: 1.1, 1.4, 4.1, 4.2, 4.3, 4.4, 7.1, 7.2, 7.3, 7.4, 7.5_
 
 - [ ] 7. Add navigation integration for completed transformations
 
@@ -71,10 +71,3 @@
   - Add proper accessibility features (ARIA labels, keyboard navigation)
   - Test and adjust layout for various screen sizes
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
-
-- [ ] 10. Add unit and integration tests
-  - Write unit tests for TransformationCard component with all visual states
-  - Write unit tests for TransformationsSection component behavior
-  - Add integration tests for API functions and data fetching
-  - Create tests for responsive behavior and user interactions
-  - _Requirements: All requirements validation through testing_
