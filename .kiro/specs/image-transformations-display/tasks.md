@@ -14,7 +14,7 @@
   - Update types.ts with proper TransformationTask interface matching design specifications
   - _Requirements: 1.4, 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [ ] 3. Create TransformationCard component
+- [x] 3. Create TransformationCard component
 
   - Implement card component with all visual states (pending, in-progress, completed, failed)
   - Add status indicators using Badge component
@@ -23,7 +23,7 @@
   - Add responsive design for different screen sizes
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 4.1, 4.2, 4.3, 4.4, 4.5, 5.1, 5.2, 5.3, 5.4, 5.5, 6.1, 6.2, 6.3_
 
-- [ ] 4. Create TransformationsSection component
+- [x] 4. Create TransformationsSection component
 
   - Implement main container component with horizontal scrolling layout
   - Add loading states using Skeleton components
@@ -32,7 +32,7 @@
   - Include scroll indicators and touch-friendly scrolling
   - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 2.3, 2.4, 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 5. Integrate TransformationsSection into Image Detail Page
+- [-] 5. Integrate TransformationsSection into Image Detail Page
 
   - Add TransformationsSection component below the main image display
   - Implement data fetching for transformation tasks using React Query
