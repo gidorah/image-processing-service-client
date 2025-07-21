@@ -28,9 +28,7 @@ export default function TransformationsSection({
 }: TransformationsSectionProps) {
   const {
     data: transformations,
-    error,
     isLoading,
-    isError,
     refetch,
     failureCount,
   } = useQuery({
@@ -70,8 +68,8 @@ export default function TransformationsSection({
 
   const router = useRouter();
   const handleCardClick = useCallback(
-    (resultImageId: string) => {
-      router.push(`/result/${resultImageId}`);
+    (taskId: string) => {
+      router.push(`/result/${taskId}`);
     },
     [router]
   );
