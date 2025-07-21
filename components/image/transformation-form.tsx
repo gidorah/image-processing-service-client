@@ -23,6 +23,8 @@ import { Control, UseFormWatch } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { transformImage } from "@/lib/api";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 
 const AccordionContentClasses = "m-3 flex flex-col gap-4";
 const SectionClasses = "flex flex-col gap-4 group";
@@ -361,15 +363,37 @@ function buildTransformationRequest(
   return transformRequest;
 }
 
-interface TransformationFormProps {
-  imageId: number;
-  onSubmissionSuccess?: () => void;
-}
-
-export default function TransformationForm({
-  imageId,
-  onSubmissionSuccess,
-}: TransformationFormProps) {
+/**
+ * TransformationForm component for submitting image transformation requests.
+ *
+ * @description This component handles image transformation form submission and automatically
+ * coordinates with other components through React Query cache invalidation.
+ *
+ * **Side Effects:**
+ * - On successful form submission, invalidates the transformations query cache
+ * - This triggers automatic refresh in any component using the same query key
+ * - Specifically affects TransformationsSection component on the same page
+ *
+ * **Dependencies:**
+ * - Requires React Query context (QueryClient) to be available
+ * - Uses queryKeys.transformations(imageId) for cache coordination
+ * - Affects any component querying transformations for the same imageId
+ *
+ * **Cache Coordination:**
+ * - Query Key: ['transformations', imageId]
+ * - Invalidation triggers: Successful transformation submission
+ * - Affected components: TransformationsSection, any other transformation list components
+ *
+ * @param props - Component props
+ * @param props.imageId - The ID of the image to transform
+ *
+ * @example
+ * ```tsx
+ * // This form will automatically refresh transformation lists on the same page
+ * <TransformationForm imageId={123} />
+ * ```
+ */
+export default function TransformationForm({ imageId }: { imageId: number }) {
   const {
     control,
     watch,
@@ -412,12 +436,22 @@ export default function TransformationForm({
     console.log("Form Errors:", errors);
   }
 
+  const queryClient = useQueryClient();
+
   const { mutate: processImage, isPending } = useMutation({
     mutationFn: transformImage,
-    onSuccess: (data) => {
-      // We will get task id for checking status and then showing transformed image
-      console.log(data);
-      onSubmissionSuccess?.();
+    onSuccess: () => {
+      try {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.transformations(imageId),
+        });
+        toast.success("Transformation submitted successfully!");
+      } catch (error) {
+        console.error("Cache invalidation failed:", error);
+        toast.success(
+          "Transformation submitted! Please refresh the page to see the new transformation in the list."
+        );
+      }
     },
     onError: (error) => {
       toast.error(
