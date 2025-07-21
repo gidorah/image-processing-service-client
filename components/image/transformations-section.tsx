@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { TransformationTask } from "@/lib/types";
+import React, { useCallback } from "react";
 import TransformationCard, {
   TransformationCardSkeleton,
 } from "./transformation-card";
@@ -9,7 +8,10 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { getImageTransformations } from "@/lib/api";
+import { getImageTransformationTasks } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { queryKeys } from "@/lib/query-keys";
 
 interface TransformationsSectionProps {
   imageId: number;
@@ -29,9 +31,11 @@ export default function TransformationsSection({
     error,
     isLoading,
     isError,
+    refetch,
+    failureCount,
   } = useQuery({
-    queryKey: ["transformations", imageId],
-    queryFn: () => getImageTransformations(imageId),
+    queryKey: queryKeys.transformations(imageId),
+    queryFn: () => getImageTransformationTasks(imageId),
     refetchInterval: (query) => {
       const hasIncomplete = query.state.data?.some((task) => {
         return task.status === "IN_PROGRESS" || task.status === "PENDING";
@@ -45,28 +49,32 @@ export default function TransformationsSection({
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const onRefresh = false;
+  const handleRefresh = useCallback(async () => {
+    try {
+      await refetch();
+    } catch (error) {
+      console.error("Failed to refresh transformations: ", error);
+    }
+  }, [refetch]);
 
-  const handleCardClick = () => {
-    console.log("someting");
-  };
+  useEffect(() => {
+    if (onFormSubmissionSuccess) {
+      // This is a bit tricky - we need to "register" our refresh function
+      // with the parent component somehow
+    }
+  }, [onFormSubmissionSuccess, handleRefresh]);
 
-  if (isError) {
-    console.log("bloaff: ", error);
-    return;
-  }
-
-  if (isLoading) {
-    console.log("loading");
-    return;
-  }
-
-  if (transformations === undefined) {
-    return;
-  }
-
-  const hasTransformations = transformations.length > 0;
+  const hasTransformations =
+    transformations !== undefined && transformations.length > 0;
   const showScrollIndicators = hasTransformations && transformations.length > 1;
+
+  const router = useRouter();
+  const handleCardClick = useCallback(
+    (resultImageId: string) => {
+      router.push(`/result/${resultImageId}`);
+    },
+    [router]
+  );
 
   return (
     <section
@@ -90,11 +98,11 @@ export default function TransformationsSection({
                 : "Transform your image to see processing tasks here"}
           </p>
         </div>
-        {onRefresh && (
+        {failureCount >= 3 && (
           <Button
             variant="outline"
             size="sm"
-            onClick={onRefresh}
+            onClick={handleRefresh}
             disabled={isLoading}
             className="gap-2"
             aria-label="Refresh transformations"
@@ -169,7 +177,7 @@ export default function TransformationsSection({
             {/* Empty State */}
             {!isLoading && !hasTransformations && (
               <div className="flex min-h-[200px] w-full items-center justify-center">
-                <EmptyState onRefresh={onRefresh} />
+                <EmptyState onRefresh={handleRefresh} />
               </div>
             )}
           </div>

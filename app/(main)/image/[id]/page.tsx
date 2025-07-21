@@ -7,6 +7,8 @@ import { getSourceImageDetails } from "@/lib/api";
 import React from "react";
 import TransformationForm from "@/components/image/transformation-form";
 import { TransformationsSection } from "@/components/image";
+import { useCallback } from "react";
+import { queryKeys } from "@/lib/query-keys";
 
 export default function ImageDetailPage({
   params,
@@ -22,10 +24,14 @@ export default function ImageDetailPage({
     isError,
     error,
   } = useQuery<SourceImageType>({
-    queryKey: ["image", imageId],
+    queryKey: queryKeys.image(imageId),
     queryFn: () => getSourceImageDetails(imageId),
     enabled: imageId >= 0 && !isNaN(imageId),
   });
+
+  const handleFormSubmissionSuccess = useCallback(() => {
+    // TransformationsSection will handle the refresh internally
+  }, []);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -49,7 +55,10 @@ export default function ImageDetailPage({
           height={500}
           className="max-h-[70vh] rounded-lg object-contain"
         />
-        <TransformationForm imageId={imageId} />
+        <TransformationForm
+          imageId={imageId}
+          onSubmissionSuccess={handleFormSubmissionSuccess}
+        />
       </div>
       <TransformationsSection imageId={imageId} />
     </div>

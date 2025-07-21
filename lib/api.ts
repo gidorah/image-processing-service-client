@@ -109,9 +109,10 @@ export const transformImage = async ({
  * @param imageId - The ID of the source image to fetch transformations for.
  * @returns  {Promise<TransformationTask[]>} - A promise that resolves to an array of transformation tasks.
  */
-export const getImageTransformations = async (
+export const getImageTransformationTasks = async (
   imageId: number
 ): Promise<TransformationTask[]> => {
+  console.log("requesting tasks");
   const response = await api.get("/tasks/");
   const results = response.data.results as TransformationTask[];
 

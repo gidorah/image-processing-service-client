@@ -361,7 +361,15 @@ function buildTransformationRequest(
   return transformRequest;
 }
 
-export default function TransformationForm({ imageId }: { imageId: number }) {
+interface TransformationFormProps {
+  imageId: number;
+  onSubmissionSuccess?: () => void;
+}
+
+export default function TransformationForm({
+  imageId,
+  onSubmissionSuccess,
+}: TransformationFormProps) {
   const {
     control,
     watch,
@@ -409,6 +417,7 @@ export default function TransformationForm({ imageId }: { imageId: number }) {
     onSuccess: (data) => {
       // We will get task id for checking status and then showing transformed image
       console.log(data);
+      onSubmissionSuccess?.();
     },
     onError: (error) => {
       toast.error(

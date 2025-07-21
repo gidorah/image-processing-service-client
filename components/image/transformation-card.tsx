@@ -127,8 +127,8 @@ export default function TransformationCard({
   const transformationsList = parseTransformations(task.transformations);
 
   const handleClick = () => {
-    if (isClickable && onClick) {
-      onClick(task.id.toString());
+    if (isClickable && onClick && task.result_image) {
+      onClick(task.result_image.toString());
     }
   };
 

@@ -50,7 +50,6 @@ ImageDetailPage
 ```typescript
 interface TransformationsSectionProps {
   imageId: number;
-  onFormSubmissionSuccess?: () => void; // Callback for form integration
 }
 ```
 
@@ -59,24 +58,24 @@ interface TransformationsSectionProps {
 - **Data Management**: Fetch transformation tasks via `getImageTransformations` API
 - **Centralized Polling**: Manage polling for incomplete tasks with smart intervals
 - **State Management**: Handle loading, error, and empty states
-- **Form Integration**: Provide callback mechanism for form submission refresh
+- **Automatic Refresh**: Respond to React Query cache invalidation from form submissions
 - **UI Orchestration**: Coordinate horizontal scrolling and responsive behavior
 
 **Data Fetching Strategy**:
 
 ```typescript
-// React Query implementation
+// React Query implementation with type-safe query keys
 const {
   data: transformations,
   isLoading,
   error,
   refetch,
 } = useQuery({
-  queryKey: ["transformations", imageId],
+  queryKey: queryKeys.transformations(imageId),
   queryFn: () => getImageTransformations(imageId),
-  refetchInterval: (data) => {
+  refetchInterval: (query) => {
     // Smart polling: only poll if there are incomplete tasks
-    const hasIncomplete = data?.some(
+    const hasIncomplete = query.state.data?.some(
       (task) => task.status === "PENDING" || task.status === "IN_PROGRESS"
     );
     return hasIncomplete ? 2000 : false; // 2 seconds for active processing
@@ -162,45 +161,129 @@ const parseTransformations = (transformations: Record<string, unknown>) => {
 
 ### Form Integration Pattern
 
-**Purpose**: Seamless communication between transformation form and transformations list
+**Purpose**: Seamless communication between transformation form and transformations list using React Query invalidation
 
-**Design Rationale**: To satisfy Requirement 7, the form submission success triggers an immediate refresh of the transformations list. This is achieved through a callback-based approach that maintains loose coupling between components.
+**Design Rationale**: To satisfy Requirement 7, the form submission success triggers an immediate refresh of the transformations list. This is achieved through React Query's cache invalidation mechanism, which provides automatic coordination between components without tight coupling.
 
 **Integration Pattern**:
 
 ```typescript
-// In Image Detail Page
-const handleFormSubmissionSuccess = useCallback(() => {
-  // TransformationsSection will handle the refresh internally
-  transformationsSectionRef.current?.refreshTransformations();
-}, []);
+// Query Key Factory for type safety and consistency
+export const queryKeys = {
+  transformations: (imageId: number) => ["transformations", imageId] as const,
+  image: (imageId: number) => ["image", imageId] as const,
+} as const;
 
-// TransformationsSection exposes refresh method
-const refreshTransformations = useCallback(async () => {
-  try {
-    await refetch();
-  } catch (error) {
-    // Retry mechanism for failed refresh after form submission
-    setTimeout(() => refetch(), 2000);
-  }
-}, [refetch]);
+// In TransformationForm component
+/**
+ * TransformationForm component
+ *
+ * Side effects:
+ * - Invalidates transformations query on successful submission
+ * - This triggers automatic refresh in TransformationsSection and any other components
+ *   using the same query key: ['transformations', imageId]
+ *
+ * Dependencies:
+ * - Requires React Query context (QueryClient)
+ * - Affects any component using transformations query for the same imageId
+ */
+const TransformationForm = ({ imageId }: { imageId: number }) => {
+  const queryClient = useQueryClient();
+
+  const { mutate: processImage } = useMutation({
+    mutationFn: transformImage,
+    onSuccess: (data) => {
+      // Invalidate transformations cache to trigger automatic refresh
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.transformations(imageId),
+      });
+    },
+  });
+};
+
+// In TransformationsSection component
+/**
+ * TransformationsSection component
+ *
+ * Data dependencies:
+ * - Automatically refreshes when transformations query is invalidated
+ * - Listens to query key: ['transformations', imageId]
+ * - Will refresh when TransformationForm successfully submits
+ */
+const TransformationsSection = ({ imageId }: { imageId: number }) => {
+  const {
+    data: transformations,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.transformations(imageId),
+    queryFn: () => getImageTransformations(imageId),
+    // Automatic refresh triggered by cache invalidation
+  });
+};
 ```
 
 **Key Features**:
 
+- **Automatic Cache Invalidation**: React Query handles refresh coordination automatically
+- **Type-Safe Query Keys**: TypeScript factory prevents typos and ensures consistency
+- **Decoupled Components**: Form and list don't need direct references to each other
+- **Network Deduplication**: React Query prevents duplicate API calls
+- **Documented Dependencies**: Clear documentation of which components affect each other
 - **No Optimistic Updates**: Wait for server response before showing new transformations
-- **Automatic Retry**: If refresh fails after form submission, retry automatically
-- **Concurrent Safety**: Form submission during active polling is handled gracefully
-- **Error Resilience**: Silent error handling with retry mechanism
 
 **Form Submission Flow**:
 
 1. User submits transformation form
-2. Form waits for server response (no optimistic updates)
-3. On success, form triggers TransformationsSection refresh
-4. TransformationsSection refetches data immediately
-5. If refresh fails, automatic retry after 2 seconds
+2. Form calls API and waits for server response (no optimistic updates)
+3. On success, form invalidates transformations query cache
+4. React Query automatically triggers refetch for all components using that query
+5. TransformationsSection receives fresh data and updates automatically
 6. New transformation appears in list once successfully fetched
+
+### Query Key Management
+
+**Purpose**: Centralized, type-safe query key management to prevent inconsistencies and enable reliable cache invalidation
+
+**Query Key Factory**:
+
+```typescript
+// lib/query-keys.ts
+export const queryKeys = {
+  // Image-related queries
+  image: (imageId: number) => ["image", imageId] as const,
+
+  // Transformation-related queries
+  transformations: (imageId: number) => ["transformations", imageId] as const,
+  transformation: (taskId: number) => ["transformation", taskId] as const,
+
+  // User-related queries (for future use)
+  user: () => ["user"] as const,
+  userImages: (userId: number) => ["user", userId, "images"] as const,
+} as const;
+```
+
+**Usage Pattern**:
+
+```typescript
+// In components - always use the factory
+const { data } = useQuery({
+  queryKey: queryKeys.transformations(imageId),
+  queryFn: () => getImageTransformations(imageId),
+});
+
+// For invalidation - consistent keys guaranteed
+queryClient.invalidateQueries({
+  queryKey: queryKeys.transformations(imageId),
+});
+```
+
+**Benefits**:
+
+- **Type Safety**: TypeScript prevents typos in query keys
+- **Consistency**: Same key format used everywhere
+- **Refactoring Safety**: Change key format in one place
+- **Documentation**: Clear structure shows all available queries
 
 ### Data Models
 
@@ -392,7 +475,16 @@ export interface TransformationTask {
 
 - Client-side data fetching via React Query (no SSR for transformations)
 - Centralized polling for real-time updates
+- Cache invalidation for component coordination
 - No optimistic updates - server-confirmed data only
+
+**React Query Architecture**:
+
+- Type-safe query key factory for consistency
+- Automatic cache invalidation for form integration
+- Smart polling with background pause
+- Network request deduplication
+- Exponential backoff for error handling
 
 **Styling Approach**:
 
@@ -403,7 +495,7 @@ export interface TransformationTask {
 
 **State Management**:
 
-- React Query for server state and caching
+- React Query for server state, caching, and component coordination
 - Local component state for UI interactions
 - Zustand integration for global app state
 
