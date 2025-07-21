@@ -24,7 +24,6 @@ interface TransformationsSectionProps {
  */
 export default function TransformationsSection({
   imageId,
-  onFormSubmissionSuccess,
 }: TransformationsSectionProps) {
   const {
     data: transformations,
@@ -55,13 +54,6 @@ export default function TransformationsSection({
     }
   }, [refetch]);
 
-  useEffect(() => {
-    if (onFormSubmissionSuccess) {
-      // This is a bit tricky - we need to "register" our refresh function
-      // with the parent component somehow
-    }
-  }, [onFormSubmissionSuccess, handleRefresh]);
-
   const hasTransformations =
     transformations !== undefined && transformations.length > 0;
   const showScrollIndicators = hasTransformations && transformations.length > 1;
@@ -73,6 +65,8 @@ export default function TransformationsSection({
     },
     [router]
   );
+
+  console.log("Transformations: ", transformations);
 
   return (
     <section

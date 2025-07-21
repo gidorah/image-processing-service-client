@@ -1,5 +1,5 @@
 import useAuthStore from "@/store/authStore";
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import {
   SourceImageType,
   TransformationTask,
@@ -7,6 +7,14 @@ import {
   TransformedImageType,
 } from "./types";
 import { TransformRequest } from "./validators";
+
+// Type for paginated API responses
+interface PaginatedResponse<T> {
+  results: T[];
+  next: string | null;
+  previous: string | null;
+  count: number;
+}
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api",
@@ -110,20 +118,55 @@ export const transformImage = async ({
 };
 
 /**
+ * Fetches all transformation tasks for the current user.
+ * Handles pagination to ensure all tasks are retrieved.
+ * @returns {Promise<TransformationTask[]>} - A promise that resolves to an array of all transformation tasks.
+ */
+export const getAllTransformationTasks = async (): Promise<
+  TransformationTask[]
+> => {
+  console.log("requesting all tasks");
+
+  let allTasks: TransformationTask[] = [];
+  let nextUrl: string | null = "/tasks/";
+
+  // Fetch all pages of tasks
+  while (nextUrl) {
+    const response: AxiosResponse<
+      PaginatedResponse<TransformationTask> | TransformationTask[]
+    > = await api.get(nextUrl);
+    const data = response.data;
+
+    // Handle both paginated and non-paginated responses
+    if (Array.isArray(data)) {
+      // Non-paginated response (array directly)
+      allTasks = allTasks.concat(data);
+      nextUrl = null;
+    } else {
+      // Paginated response
+      allTasks = allTasks.concat(data.results);
+      nextUrl = data.next;
+    }
+  }
+
+  return allTasks;
+};
+
+/**
  * Fetches all transformation tasks associated with a source image by its ID.
+ * Handles pagination to ensure all tasks are retrieved.
  * @param imageId - The ID of the source image to fetch transformations for.
  * @returns  {Promise<TransformationTask[]>} - A promise that resolves to an array of transformation tasks.
  */
 export const getImageTransformationTasks = async (
   imageId: number
 ): Promise<TransformationTask[]> => {
-  console.log("requesting tasks");
-  const response = await api.get("/tasks/");
-  const results = response.data.results as TransformationTask[];
+  console.log("requesting tasks for image", imageId);
 
-  // Since tasks endpoint returns all tasks of user
-  // we should filter them by source image
-  return results.filter((task) => task.original_image === imageId);
+  const allTasks = await getAllTransformationTasks();
+
+  // Filter tasks by source image
+  return allTasks.filter((task) => task.original_image === imageId);
 };
 
 /**
@@ -146,9 +189,7 @@ export const getTransformationTask = async (
 export const getTransformedImage = async (
   transformedImageId: number
 ): Promise<TransformedImageType> => {
-  const response = await api.get(
-    `/api/images/transformed/${transformedImageId}`
-  );
+  const response = await api.get(`/images/transformed/${transformedImageId}/`);
   return response.data;
 };
 
