@@ -1,6 +1,11 @@
 import useAuthStore from "@/store/authStore";
 import axios, { AxiosError } from "axios";
-import { SourceImageType, TransformationTask, User } from "./types";
+import {
+  SourceImageType,
+  TransformationTask,
+  User,
+  TransformedImageType,
+} from "./types";
 import { TransformRequest } from "./validators";
 
 const api = axios.create({
@@ -130,6 +135,20 @@ export const getTransformationTask = async (
   taskId: number
 ): Promise<TransformationTask> => {
   const response = await api.get(`/tasks/${taskId}/`);
+  return response.data;
+};
+
+/**
+ * Fetches the transformed image by its ID.
+ * @param transformedImageId - The ID of the transformed image to fetch.
+ * @returns {Promise<TransformedImageType>} - A promise that resolves to the transformed image details.
+ */
+export const getTransformedImage = async (
+  transformedImageId: number
+): Promise<TransformedImageType> => {
+  const response = await api.get(
+    `/api/images/transformed/${transformedImageId}`
+  );
   return response.data;
 };
 
