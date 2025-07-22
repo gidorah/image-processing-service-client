@@ -6,12 +6,12 @@ This document outlines the step-by-step tasks required to implement the "Transfo
 
 This phase focuses on creating a dedicated, performant API endpoint to fetch transformation tasks for a specific image.
 
-- [ ] **Create a dedicated API endpoint to fetch tasks for a specific image.**
+- [x] **Create a dedicated API endpoint to fetch tasks for a specific image.**
   - **Task:** Implement the `GET /api/images/<id>/tasks/` endpoint that returns a JSON list of transformation tasks associated with the given image ID.
   - **File Path:** `backend/apps/images/api/views.py` (Note: This is a placeholder path for the Django backend.)
   - _Requirements: T403-FR01, T403-NR01_
   - **Sub-task:**
-    - [ ] **Write an integration test for the new API endpoint.**
+    - [x] **Write an integration test for the new API endpoint.**
       - **Task:** Create a test that verifies the endpoint returns the correct tasks for a given image ID and handles cases where no tasks exist.
       - **File Path:** `backend/apps/images/api/tests/test_views.py` (Note: Placeholder path.)
 
