@@ -1,20 +1,13 @@
 import useAuthStore from "@/store/authStore";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError } from "axios";
 import {
   SourceImageType,
   TransformationTask,
   User,
   TransformedImageType,
+  PaginatedResponse,
 } from "./types";
 import { TransformRequest } from "./validators";
-
-// Type for paginated API responses
-interface PaginatedResponse<T> {
-  results: T[];
-  next: string | null;
-  previous: string | null;
-  count: number;
-}
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api",

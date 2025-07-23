@@ -11,6 +11,7 @@
  */
 export const queryKeys = {
   transformations: (imageId: number) => ["transformations", imageId] as const,
+  imageTasks: (imageId: number) => ["imageTasks", imageId] as const,
   image: (imageId: number) => ["image", imageId] as const,
   transformation: (taskId: number) => ["transformation", taskId] as const,
 };

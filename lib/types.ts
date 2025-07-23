@@ -7,6 +7,16 @@ export interface User {
 }
 
 /**
+ * Type for paginated API responses
+ */
+export interface PaginatedResponse<T> {
+  results: T[];
+  next: string | null;
+  previous: string | null;
+  count: number;
+}
+
+/**
  * Represents the structure of an Image Metadata.
  * TODO: Could be detailed later
  */

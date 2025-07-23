@@ -7,11 +7,11 @@ import TransformationCard, {
 import { Button } from "@/components/ui/button";
 import { RefreshCw, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { getImageTransformationTasks } from "@/lib/api";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { getImageTransformationTasksById } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { queryKeys } from "@/lib/query-keys";
+import { TransformationTask } from "@/lib/types";
 
 interface TransformationsSectionProps {
   imageId: number;
@@ -26,24 +26,30 @@ export default function TransformationsSection({
   imageId,
 }: TransformationsSectionProps) {
   const {
-    data: transformations,
+    data,
     isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     refetch,
-    failureCount,
-  } = useQuery({
-    queryKey: queryKeys.transformations(imageId),
-    queryFn: () => getImageTransformationTasks(imageId),
+  } = useInfiniteQuery({
+    queryKey: queryKeys.imageTasks(imageId),
+    queryFn: ({ pageParam = undefined }: { pageParam?: string }) =>
+      getImageTransformationTasksById({ imageId, pageParam }),
+    getNextPageParam: (lastPage) => lastPage.next ?? null,
     refetchInterval: (query) => {
-      const hasIncomplete = query.state.data?.some((task) => {
-        return task.status === "IN_PROGRESS" || task.status === "PENDING";
-      });
+      // We only want to poll the first page for updates
+      const firstPage = query.state.data?.pages[0];
+      if (!firstPage) return false;
+
+      const hasIncomplete = firstPage.results.some(
+        (task: TransformationTask) =>
+          task.status === "IN_PROGRESS" || task.status === "PENDING"
+      );
       return hasIncomplete ? 2000 : false;
     },
-    refetchIntervalInBackground: false, // We don't want refetch when tab is inactive
-    retry: (failureCount) => {
-      return failureCount < 3;
-    },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    initialPageParam: undefined,
   });
 
   const handleRefresh = useCallback(async () => {
@@ -54,8 +60,8 @@ export default function TransformationsSection({
     }
   }, [refetch]);
 
-  const hasTransformations =
-    transformations !== undefined && transformations.length > 0;
+  const transformations = data?.pages.flatMap((page) => page.results) ?? [];
+  const hasTransformations = transformations.length > 0;
   const showScrollIndicators = hasTransformations && transformations.length > 1;
 
   const router = useRouter();
@@ -65,8 +71,6 @@ export default function TransformationsSection({
     },
     [router]
   );
-
-  console.log("Transformations: ", transformations);
 
   return (
     <section
@@ -90,7 +94,7 @@ export default function TransformationsSection({
                 : "Transform your image to see processing tasks here"}
           </p>
         </div>
-        {failureCount >= 3 && (
+        {isError && (
           <Button
             variant="outline"
             size="sm"
@@ -141,7 +145,7 @@ export default function TransformationsSection({
             )}
           >
             {/* Loading State */}
-            {isLoading && (
+            {isLoading && !isFetchingNextPage && (
               <>
                 {Array.from({ length: 3 }).map((_, index) => (
                   <div key={index} className="snap-start">
@@ -154,6 +158,16 @@ export default function TransformationsSection({
             {/* Transformations List */}
             {!isLoading && hasTransformations && (
               <>
+                {hasNextPage && (
+                  <div className="snap-start">
+                    <Button
+                      onClick={() => fetchNextPage()}
+                      disabled={isFetchingNextPage}
+                    >
+                      {isFetchingNextPage ? "Loading more..." : "Load More"}
+                    </Button>
+                  </div>
+                )}
                 {transformations.map((task) => (
                   <div key={task.id} className="snap-start">
                     <TransformationCard
