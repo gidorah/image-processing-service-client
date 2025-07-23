@@ -12,6 +12,7 @@ import { getImageTransformationTasksById } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { queryKeys } from "@/lib/query-keys";
 import { TransformationTask } from "@/lib/types";
+import { LoadMoreCard } from "./load-more-card";
 
 interface TransformationsSectionProps {
   imageId: number;
@@ -60,7 +61,9 @@ export default function TransformationsSection({
     }
   }, [refetch]);
 
-  const transformations = data?.pages.flatMap((page) => page.results) ?? [];
+  const transformations =
+    data?.pages.flatMap((page) => page.results).sort((a, b) => a.id - b.id) ??
+    [];
   const hasTransformations = transformations.length > 0;
   const showScrollIndicators = hasTransformations && transformations.length > 1;
 
@@ -160,12 +163,10 @@ export default function TransformationsSection({
               <>
                 {hasNextPage && (
                   <div className="snap-start">
-                    <Button
+                    <LoadMoreCard
                       onClick={() => fetchNextPage()}
-                      disabled={isFetchingNextPage}
-                    >
-                      {isFetchingNextPage ? "Loading more..." : "Load More"}
-                    </Button>
+                      isFetchingNextPage={isFetchingNextPage}
+                    />
                   </div>
                 )}
                 {transformations.map((task) => (

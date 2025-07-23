@@ -376,7 +376,7 @@ function buildTransformationRequest(
  *
  * **Dependencies:**
  * - Requires React Query context (QueryClient) to be available
- * - Uses queryKeys.transformations(imageId) for cache coordination
+ * - Uses queryKeys.imageTasks(imageId) for cache coordination
  * - Affects any component querying transformations for the same imageId
  *
  * **Cache Coordination:**
@@ -443,7 +443,7 @@ export default function TransformationForm({ imageId }: { imageId: number }) {
     onSuccess: () => {
       try {
         queryClient.invalidateQueries({
-          queryKey: queryKeys.transformations(imageId),
+          queryKey: queryKeys.imageTasks(imageId),
         });
         toast.success("Transformation submitted successfully!");
       } catch (error) {
