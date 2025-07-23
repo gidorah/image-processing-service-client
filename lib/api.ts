@@ -118,43 +118,7 @@ export const transformImage = async ({
 };
 
 /**
- * Fetches all transformation tasks for the current user.
- * Handles pagination to ensure all tasks are retrieved.
- * @returns {Promise<TransformationTask[]>} - A promise that resolves to an array of all transformation tasks.
- */
-export const getAllTransformationTasks = async (): Promise<
-  TransformationTask[]
-> => {
-  console.log("requesting all tasks");
-
-  let allTasks: TransformationTask[] = [];
-  let nextUrl: string | null = "/tasks/";
-
-  // Fetch all pages of tasks
-  while (nextUrl) {
-    const response: AxiosResponse<
-      PaginatedResponse<TransformationTask> | TransformationTask[]
-    > = await api.get(nextUrl);
-    const data = response.data;
-
-    // Handle both paginated and non-paginated responses
-    if (Array.isArray(data)) {
-      // Non-paginated response (array directly)
-      allTasks = allTasks.concat(data);
-      nextUrl = null;
-    } else {
-      // Paginated response
-      allTasks = allTasks.concat(data.results);
-      nextUrl = data.next;
-    }
-  }
-
-  return allTasks;
-};
-
-/**
  * Fetches all transformation tasks associated with a source image by its ID.
- * Handles pagination to ensure all tasks are retrieved.
  * @param imageId - The ID of the source image to fetch transformations for.
  * @returns  {Promise<TransformationTask[]>} - A promise that resolves to an array of transformation tasks.
  */
@@ -162,11 +126,29 @@ export const getImageTransformationTasks = async (
   imageId: number
 ): Promise<TransformationTask[]> => {
   console.log("requesting tasks for image", imageId);
+  const response = await api.get(`/images/${imageId}/tasks/`);
+  return response.data.results;
+};
 
-  const allTasks = await getAllTransformationTasks();
-
-  // Filter tasks by source image
-  return allTasks.filter((task) => task.original_image === imageId);
+/**
+ * Fetches a paginated list of transformation tasks for a specific image.
+ * This function is designed to be used with `useInfiniteQuery` from TanStack Query.
+ *
+ * @param {object} params - The function parameters.
+ * @param {number} params.imageId - The ID of the image for which to fetch tasks.
+ * @param {string} [params.pageParam] - The URL for the next page of results, typically from the `next` property of a previous API response.
+ * @returns {Promise<PaginatedResponse<TransformationTask>>} A promise that resolves to the paginated API response.
+ */
+export const getImageTransformationTasksById = async ({
+  imageId,
+  pageParam,
+}: {
+  imageId: number;
+  pageParam?: string;
+}): Promise<PaginatedResponse<TransformationTask>> => {
+  const url = pageParam || `/images/${imageId}/tasks/`;
+  const response = await api.get<PaginatedResponse<TransformationTask>>(url);
+  return response.data;
 };
 
 /**

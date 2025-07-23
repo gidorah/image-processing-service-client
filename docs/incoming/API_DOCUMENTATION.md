@@ -552,9 +552,39 @@ _(Requires authentication)_
 
 ---
 
+### List Image Transformation Tasks
+
+Lists all transformation tasks for a specific image.
+
+**Request:**
+
+```http
+GET /api/images/<id>/tasks/
+```
+
+_(Requires authentication)_
+
+**Response:**
+
+```json
+[
+  {
+    "id": 0,
+    "original_image": 0,
+    "result_image": 0,
+    "status": "string",
+    "transformations": {},
+    "format": "string",
+    "created_at": "2024-01-01T12:00:00Z",
+    "updated_at": "2024-01-01T12:00:00Z",
+    "error_message": "string"
+  }
+]
+```
+
 ### List Transformation Tasks
 
-Lists all transformation tasks for the user.
+Lists all transformation tasks belongs to user.
 
 **Request:**
 

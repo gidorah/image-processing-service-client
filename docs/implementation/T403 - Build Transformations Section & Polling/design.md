@@ -29,6 +29,7 @@ The feature has been implemented with the following component structure, which s
 
 - **`TransformationsSection`**: This existing container component already handles the core logic, including data fetching and polling with TanStack Query. It renders the list of transformations in a horizontally scrollable view.
 - **`TransformationCard`**: This existing component serves as the detailed view for a single transformation task. It correctly displays various statuses (`PENDING`, `IN_PROGRESS`, `SUCCESS`, `FAILED`) with appropriate visual indicators and handles user interaction.
+- **`LoadMoreCard`**: This new component will be displayed at the beginning of the list and will trigger the loading of the next page of tasks when it becomes visible.
 
 ### Data Flow
 
@@ -42,17 +43,17 @@ sequenceDiagram
     participant API as Django REST API
 
     User->>TransformationsSection: Navigates to Image Detail page
-    TransformationsSection->>TanStackQuery: useQuery(['imageTasks', imageId], fetchTasks)
+    TransformationsSection->>TanStackQuery: useInfiniteQuery(['imageTasks', imageId], fetchTasks)
     TanStackQuery->>API: GET /api/images/<id>/tasks/
-    API-->>TanStackQuery: Returns initial list of tasks (e.g., one is PENDING)
+    API-->>TanStackQuery: Returns first page of tasks
     TanStackQuery-->>TransformationsSection: Provides data and isLoading state
-    TransformationsSection->>User: Renders initial list with "PENDING" status
+    TransformationsSection->>User: Renders initial list with "PENDING" status and "Load More" button
 
     Note over TanStackQuery: Polling starts (refetchInterval: 2500ms)
 
     loop Every 2.5 seconds
         TanStackQuery->>API: GET /api/images/<id>/tasks/
-        API-->>TanStackQuery: Returns updated list of tasks
+        API-->>TanStackQuery: Returns updated list of tasks for the first page
     end
 
     Note over API: Task status changes from PENDING to SUCCESS
@@ -61,6 +62,14 @@ sequenceDiagram
     API-->>TanStackQuery: Returns updated list with "SUCCESS" status
     TanStackQuery-->>TransformationsSection: Provides updated data
     TransformationsSection->>User: UI automatically updates to show "SUCCESS" status
+
+    User->>TransformationsSection: Scrolls to the beginning of the list, making "Load More" visible
+    TransformationsSection->>TanStackQuery: fetchNextPage()
+    TanStackQuery->>API: GET /api/images/<id>/tasks/?cursor=...
+    API-->>TanStackQuery: Returns next page of tasks
+    TanStackQuery-->>TransformationsSection: Appends new page to the existing list
+    TransformationsSection->>User: Renders the combined list of tasks
+
     User->>TransformationsSection: Clicks on completed task
     TransformationsSection->>User: Redirects to /result/<taskId>
 ```
@@ -69,15 +78,15 @@ sequenceDiagram
 
 ### `TransformationsSection` Component (Existing)
 
-- **Purpose & Responsibilities**: This component is the smart container that orchestrates the display of transformation tasks. It correctly uses TanStack Query to fetch data and implement polling, which stops when all tasks reach a terminal state.
+- **Purpose & Responsibilities**: This component is the smart container that orchestrates the display of transformation tasks. It will be refactored to use TanStack Query's `useInfiniteQuery` hook to handle pagination. It will manage polling for the most recent page of tasks and will stop polling when all tasks on that page are in a terminal state. It will also be responsible for rendering the `LoadMoreCard` and fetching subsequent pages.
 - **Props**:
   ```typescript
   interface TransformationsSectionProps {
     imageId: number;
   }
   ```
-- **Data Fetching Strategy**: It currently uses `getImageTransformationTasks` for data fetching. **This is a critical performance bottleneck.** The function fetches all user tasks and filters on the client.
-- **Required Refactoring**: The `queryFn` within this component's `useQuery` hook must be updated to use a new, efficient API function that fetches tasks specifically for the given `imageId`.
+- **Data Fetching Strategy**: It will use `useInfiniteQuery` to fetch paginated data from the `GET /api/images/<id>/tasks/` endpoint. The `getImageTransformationTasksById` function will need to be updated to support cursor-based pagination.
+- **Required Refactoring**: The component must be refactored from `useQuery` to `useInfiniteQuery`. The logic for polling should be adapted to only refetch the first page, and a mechanism to trigger `fetchNextPage` must be implemented.
 
 ### `TransformationCard` Component (Existing)
 
@@ -136,10 +145,7 @@ sequenceDiagram
 ## Performance Considerations
 
 - **Optimization Strategies**:
-  - **CRITICAL**: The primary optimization is to refactor `getImageTransformationTasks` in `lib/api.ts` to call a dedicated backend endpoint (`GET /api/images/<id>/tasks/`). This avoids fetching all tasks for a user and filtering on the client, which is the main performance bottleneck.
-  - The component already correctly disables polling when the browser tab is inactive (`refetchIntervalInBackground: false`), which is good practice.
-- The `TransformationCard` can be wrapped in `React.memo` to prevent re-renders if its props haven't changed, though this is a minor optimization.
-- **High-Volume Performance**: For images with a very large number of tasks, virtualization could be implemented in `TransformationList` using a library like `@tanstack/react-virtual` to ensure the UI remains performant. This will be considered if performance degradation is observed.
+- **High-Volume Performance**: The implementation of cursor-based pagination with `useInfiniteQuery` is the primary strategy for handling a large number of tasks efficiently. This avoids loading all tasks at once, ensuring the UI remains performant regardless of the total number of transformations. Virtualization is no longer the primary strategy but can be reconsidered if individual page sizes become excessively large.
 - **Monitoring**: The performance of the `GET /api/images/<id>/tasks/` endpoint will be monitored to ensure it stays below the 300ms response time target defined in `T403-NR01`.
 
 ## Implementation Notes
