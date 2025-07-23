@@ -25,7 +25,7 @@ This phase refactors the frontend to use the new, efficient API endpoint.
   - **File Path:** `lib/api.ts`
   - _Requirements: T403-FR01, T403-FR06, T403-NR01_
 
-- [ ] **3. Refactor the `TransformationsSection` component to use the new data fetching function.**
+- [x] **3. Refactor the `TransformationsSection` component to use the new data fetching function.**
   - **Task:** Update the `TransformationsSection` component to use `useInfiniteQuery`. The `queryFn` should call `getImageTransformationTasksById`, and the query key should be updated to `['imageTasks', imageId]` to ensure correct caching. Implement the "load more" functionality to fetch subsequent pages.
   - **File Path:** `components/image/transformations-section.tsx`
   - _Requirements: T403-FR01, T403-FR02, T403-FR03, T403-FR06, T403-NR02_
