@@ -13,7 +13,7 @@ export const LoadMoreCard: React.FC<LoadMoreCardProps> = ({
   isFetchingNextPage,
 }) => {
   return (
-    <Card className="flex h-full min-h-[220px] w-[280px] min-w-[280px] flex-col items-center justify-center">
+    <Card className="flex h-[160px] w-[200px] flex-col items-center justify-center md:h-[180px] md:w-[240px] lg:h-[200px] lg:w-[280px]">
       <CardContent className="flex flex-col items-center justify-center p-6">
         <Button
           onClick={onClick}
