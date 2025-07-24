@@ -8,6 +8,7 @@ import {
   UseInfiniteQueryResult,
 } from "@tanstack/react-query";
 import { ReactNode } from "react";
+import { mockRouter } from "../../../test-setup";
 
 vi.mock("@tanstack/react-query", async () => {
   const actual = await vi.importActual("@tanstack/react-query");
@@ -91,6 +92,7 @@ describe("TransformationsSection", () => {
   beforeEach(() => {
     queryClient.clear();
     vi.restoreAllMocks();
+    mockRouter.push.mockClear();
   });
 
   it("renders loading state correctly", () => {
@@ -141,7 +143,7 @@ describe("TransformationsSection", () => {
     expect(refetch).toHaveBeenCalledTimes(1);
   });
 
-  it("calls onCardClick when a completed transformation card is clicked", () => {
+  it("navigates to result page when a completed transformation card is clicked", () => {
     mockUseInfiniteQuery({
       data: { pages: [{ results: mockTransformations }], pageParams: [] },
       isLoading: false,
@@ -152,7 +154,9 @@ describe("TransformationsSection", () => {
     const card = screen.getByTestId("transformation-card");
     fireEvent.click(card);
 
-    // This test will need to be updated to check if the router push function was called
-    // For now, we are just checking if the test runs without errors
+    expect(mockRouter.push).toHaveBeenCalledTimes(1);
+    expect(mockRouter.push).toHaveBeenCalledWith(
+      `/result/${mockTransformations[0].id}`
+    );
   });
 });
