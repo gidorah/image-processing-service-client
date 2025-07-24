@@ -40,7 +40,7 @@ This phase includes minor component optimizations and creating Storybook stories
   - **File Path:** `components/image/transformation-card.tsx`
   - _Requirements: T403-NR04_
 
-- [ ] **5. Create a Storybook story for the `TransformationCard` component.**
+- [x] **5. Create a Storybook story for the `TransformationCard` component.**
 
   - **Task:** Develop a new Storybook file that showcases all visual states of the `TransformationCard` (e.g., PENDING, IN_PROGRESS, SUCCESS, FAILED).
   - **File Path:** `components/image/transformation-card.stories.tsx` (New file)
