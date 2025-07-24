@@ -117,7 +117,25 @@ const getStatusConfig = (status: TransformationTask["status"]) => {
   }
 };
 
-export default function TransformationCard({
+/**
+ * TransformationCard displays a summary of an image transformation task,
+ * including its status, transformation operations, and error messages.
+ *
+ * - Shows a status badge and icon for each task state (pending, processing, success, failed, cancelled).
+ * - Lists the transformation operations applied in the task.
+ * - Displays error details for failed tasks.
+ * - Allows navigation to the result page for successful tasks via click or keyboard.
+ * - Applies clear visual distinctions for each status to improve usability.
+ *
+ * React.memo is used to prevent unnecessary re-renders when props do not change,
+ * optimizing performance in lists with frequent polling or updates.
+ *
+ * @param task        Transformation task data to display.
+ * @param onClick     Optional callback for card click (used for navigation).
+ * @param isClickable If true, card is interactive and accessible as a button.
+ */
+
+function TransformationCard({
   task,
   onClick,
   isClickable,
@@ -268,3 +286,5 @@ export function TransformationCardSkeleton() {
     </Card>
   );
 }
+
+export default React.memo(TransformationCard);
