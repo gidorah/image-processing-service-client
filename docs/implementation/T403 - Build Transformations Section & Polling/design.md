@@ -90,7 +90,7 @@ sequenceDiagram
 
 ### `TransformationCard` Component (Existing)
 
-- **Purpose & Responsibilities**: This component is responsible for rendering a single transformation task with all its visual states (status, format, parameters, timestamp). It correctly handles clickability for completed tasks and includes accessibility attributes.
+- **Purpose & Responsibilities**: This component renders a single transformation task with all its visual states (status, format, timestamp). To maintain a clean interface, it displays a count of the applied transformations, with the full list available in a tooltip on hover. It correctly handles clickability for completed tasks and includes accessibility attributes.
 - **Props**:
   ```typescript
   interface TransformationCardProps {
@@ -100,7 +100,6 @@ sequenceDiagram
   }
   ```
 - **Side effects**: Handles navigation via the `onClick` prop.
-- **Assessment**: This component is well-implemented and meets requirements. No refactoring is needed.
 
 #### User Interface Design
 
