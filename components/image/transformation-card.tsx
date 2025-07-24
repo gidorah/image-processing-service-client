@@ -14,6 +14,12 @@ import {
   AlertCircle,
   Loader2,
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TransformationCardProps {
   task: TransformationTask;
@@ -204,23 +210,28 @@ function TransformationCard({
           </h4>
           <div className="space-y-0.5">
             {transformationsList.length > 0 ? (
-              transformationsList.slice(0, 3).map((transformation, index) => (
-                <div
-                  key={index}
-                  className="text-muted-foreground truncate text-xs"
-                  title={transformation}
-                >
-                  • {transformation}
-                </div>
-              ))
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="text-muted-foreground cursor-default text-xs">
+                      • {transformationsList.length} transformation
+                      {transformationsList.length > 1 ? "s" : ""}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <div className="space-y-1 p-2">
+                      {transformationsList.map((transformation, index) => (
+                        <div key={index} className="text-xs">
+                          {transformation}
+                        </div>
+                      ))}
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             ) : (
               <div className="text-muted-foreground text-xs">
                 • No transformations
-              </div>
-            )}
-            {transformationsList.length > 3 && (
-              <div className="text-muted-foreground text-xs">
-                • +{transformationsList.length - 3} more
               </div>
             )}
           </div>
