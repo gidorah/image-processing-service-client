@@ -34,7 +34,7 @@ This phase refactors the frontend to use the new, efficient API endpoint.
 
 This phase includes minor component optimizations and creating Storybook stories for UI validation and testing.
 
-- [ ] **4. Optimize the `TransformationCard` component.**
+- [x] **4. Optimize the `TransformationCard` component.**
 
   - **Task:** Wrap the `TransformationCard` component in `React.memo` to prevent unnecessary re-renders, as suggested in the performance considerations.
   - **File Path:** `components/image/transformation-card.tsx`
